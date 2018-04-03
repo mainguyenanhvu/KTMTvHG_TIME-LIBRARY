@@ -1,15 +1,23 @@
 .data 
-	time: .asciiz"25/12/1997"
+	time: .asciiz"04/04/2018"
+	Monday: .asciiz"Mon"
+	Tuesday: .asciiz"Tue"
+	Wednesday: .asciiz"Wed"
+	Thursday: .asciiz"Thurs"
+	Friday: .asciiz"Fri"
+	Saturday: .asciiz"Sat"
+	Sunday: .asciiz"Sun"
 .text
 .globl main
 
 
 main: 
 	la $a0,time
-	jal Year
+	jal Weekday
 	
 	add $a0,$v0,$0
-	li $v0,1
+	#li $v0,1 In kieu int
+	li $v0,4
 	syscall
 	j EndOfFile
 
@@ -85,7 +93,7 @@ lw $ra,0($sp)
 addi $sp,$sp,4 
 
 jr $ra #Tro lai hàm truoc dó
-
+EndDay:
 
 #Gia su là bién time da duoc truyen vào thanh ghi $a0
 #$a0: Luu tham so truyen vào tu bien time
@@ -160,7 +168,7 @@ lw $ra,0($sp)
 addi $sp,$sp,4 
 
 jr $ra #Tro lai hàm truoc dó
-
+EndMonth:
 
 #Gia su là bién time da duoc truyen vào thanh ghi $a0
 #$a0: Luu tham so truyen vào tu bien time
@@ -235,5 +243,113 @@ lw $ra,0($sp)
 addi $sp,$sp,4 
 
 jr $ra #Tro lai hàm truoc dó
+EndYear:
+
+Weekday:
+#Luu $ra
+addi $sp,$sp,-4 
+sw $ra,0($sp) 
+
+#Luu $t0
+addi $sp,$sp,-4 
+sw $t0,0($sp)
+
+#Luu $t1
+addi $sp,$sp,-4 
+sw $t1,0($sp)
+
+#Luu $a0
+addi $sp,$sp,-4 
+sw $a0,0($sp)
+
+#Luu $t2
+addi $sp,$sp,-4 
+sw $t2,0($sp)
+
+#Luu $t3
+addi $sp,$sp,-4 
+sw $t3,0($sp)
+
+	jal Day
+	add $t0,$v0,$0 
+
+	jal Month
+	add $t1,$v0,$0
+	
+	jal Year
+	add $t2,$v0,$0
+
+	add $v0,$t0,$t1
+	addi $t3,$0,100
+	div $t2,$t3
+	mfhi $t3 #Year div 100 + 1= The ki
+	addi $t3,$t3,1
+	add $v0,$v0,$t3
+	
+	mflo $t3 #Year mod 100
+	add $v0,$v0,$t3
+
+	addi $t2,$0,4
+	div $t3,$t2
+	mflo $t2  #Year div 4
+	add $v0,$v0,$t2
+	addi $t2,$0,7
+	div $v0,$t2 
+	mfhi $v0 #mod 7
+
+SwitchCaseOfWeekday:	
+	bne $v0,$0,Mon
+	la $v0,Sunday
+	j EndSwitchCaseOfWeekday
+Mon:
+	addi $v0,$v0,-1
+	bne $v0,$0,Tue
+	la $v0,Monday
+	j EndSwitchCaseOfWeekday
+Tue:
+	addi $v0,$v0,-1
+	bne $v0,$0,Web
+	la $v0,Tuesday
+	j EndSwitchCaseOfWeekday	
+Web:
+	addi $v0,$v0,-1
+	bne $v0,$0,Thurs
+	la $v0,Wednesday
+	j EndSwitchCaseOfWeekday
+Thurs:
+	addi $v0,$v0,-1
+	bne $v0,$0,Fri
+	la $v0,Thursday
+	j EndSwitchCaseOfWeekday
+Fri:
+	addi $v0,$v0,-1
+	bne $v0,$0,Sat
+	la $v0,Friday
+	j EndSwitchCaseOfWeekday
+Sat:
+	la $v0,Saturday
+EndSwitchCaseOfWeekday:
+	
+#Tra lai giá tri cho $t3
+lw $t3,0($sp)
+addi $sp,$sp,4
+#Tra lai giá tri cho $t2
+lw $t2,0($sp)
+addi $sp,$sp,4 
+#Tra lai giá tri cho $a0
+lw $a0,0($sp)
+addi $sp,$sp,4 
+#Tra lai giá tri cho $t1
+lw $t1,0($sp)
+addi $sp,$sp,4 
+#Tra lai giá tri cho $t0
+lw $t0,0($sp)
+addi $sp,$sp,4 
+#Tra lai giá tri cho $ra
+lw $ra,0($sp) 
+addi $sp,$sp,4 
+
+jr $ra #Tro lai hàm truoc dó
+EndWeekday:
 
 EndOfFile:
