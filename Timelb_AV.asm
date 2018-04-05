@@ -9,19 +9,236 @@
 	Friday: .asciiz"Fri"
 	Saturday: .asciiz"Sat"
 	Sunday: .asciiz"Sun"
+	newline: .asciiz"\n"
+	startAnnounce: .asciiz" 1. Xuat chuoi TIME theo dinh dang DD/MM/YYYY \n 2. Chuyen doi chuoi TIME thanh mot trong cac dinh dang sau: \n     A. MM/DD/YYYY \n     B. Month DD, YYYY \n     C. DD Month, YYYY \n 3. Cho biet ngay vua nhap la ngay thu may trong tuan: \n 4. Kiem tra nam trong chuoi TIME co phai la nam nhuan khong \n 5. Cho biet khoang thoi gian giua chuoi TIME_1 va TIME_2 \n 6. Cho biet 2 nam nhuan gan nhat voi nam trong chuoi time \n"
+	charRequestNumber: .space 2
+	charRequestAlphabet: .space 2
+	stringLuaChon: .asciiz"Lua chon: "
+	stringKetQua: .asciiz"Ket qua: "
 .text
 .globl main
 #-----------------------------------------------------------
 
 main: 
-	la $a0,time1
-	la $a1,time2
-	jal GetTime
 	
+	#jal GetTime
+	#add $a0,$v0,$0
+	#li $v0,1 #In kieu int
+ChooseRequestNumber:
+	#In thong bao va doc ki tu
+	la $a0,startAnnounce
+	li $v0,4 #In xau ra man hinh
+	syscall
+	li $v0, 8       #Goi ham nhap 1 ki tu
+	la $a0, charRequestNumber        #Tai dia chi de doc
+	li $a1, 2       #Chieu dai cua chuoi la 1 byte va 1 null
+	syscall         #Luu char tu buffer vao charRequest
+	lb $t0,charRequestNumber
+
+	#Kiem tra ki tu nhap vao
+	addi $t1,$0,49
+	slt $t2,$t0,$t1
+	bne $t2,$0,ChooseRequestNumber #Ki tu doc vao <49 (nho hon 1)
+	addi $t1,$t1,5 #$t1 la ki tu 54 (so 6)
+	slt $t2,$t1,$t0
+	bne $t2,$0,ChooseRequestNumber #Ki tu doc vao >54 (lon hon 6)
+Choose6:
+	bne $t1,$t0,Choose5
+	#jal NextLeapYear
+	#Luu tru $a0, $v0
+	addi $sp,$sp,-8
+	sw $a0,0($sp)
+	sw $v0,4($sp)
+	la $a0,newline
+	li $v0,4 #In xau ra man hinh
+	syscall
+	la $a0,stringLuaChon
+	li $v0,4 #In xau ra man hinh
+	syscall
+	la $a0, charRequestNumber
+	li $v0,4    # in ki tu ra nam hinh
+	syscall
+	la $a0,newline
+	li $v0,4 #In xau ra man hinh
+	syscall
+	la $a0,stringKetQua
+	li $v0,4 #In xau ra man hinh
+	syscall
+	#Tra lai $v0, $a0
+	lw $v0,4($sp)
+	lw $a0,0($sp)
+	addi $sp,$sp,8
+	j EndChooseRequestNumber
+Choose5:
+	addi $t1,$t1,-1
+	bne $t1,$t0,Choose4
+	#jal Nhap time1
+	#jal Nhap time2
+	la $a0,time1 #($v0)
+	la $a1,time2 #($v1)
+	jal GetTime
+	#Luu tru $a0, $v0
+	addi $sp,$sp,-8
+	sw $a0,0($sp)
+	sw $v0,4($sp)
+	la $a0,newline
+	li $v0,4 #In xau ra man hinh
+	syscall
+	la $a0,stringLuaChon
+	li $v0,4 #In xau ra man hinh
+	syscall
+	la $a0, charRequestNumber
+	li $v0,4    # in ki tu ra nam hinh
+	syscall
+	la $a0,newline
+	li $v0,4 #In xau ra man hinh
+	syscall
+	la $a0,stringKetQua
+	li $v0,4 #In xau ra man hinh
+	syscall
+	#Tra lai $v0, $a0
+	lw $v0,4($sp)
+	lw $a0,0($sp)
+	addi $sp,$sp,8
+	#In ket qua
 	add $a0,$v0,$0
 	li $v0,1 #In kieu int
-	#li $v0,4
 	syscall
+	j EndChooseRequestNumber
+Choose4:
+	addi $t1,$t1,-1
+	bne $t1,$t0,Choose3
+	#jal LeapYear
+	#Luu tru $a0, $v0
+	addi $sp,$sp,-8
+	sw $a0,0($sp)
+	sw $v0,4($sp)
+	la $a0,newline
+	li $v0,4 #In xau ra man hinh
+	syscall
+	la $a0,stringLuaChon
+	li $v0,4 #In xau ra man hinh
+	syscall
+	la $a0, charRequestNumber
+	li $v0,4    # in ki tu ra nam hinh
+	syscall
+	la $a0,newline
+	li $v0,4 #In xau ra man hinh
+	syscall
+	la $a0,stringKetQua
+	li $v0,4 #In xau ra man hinh
+	syscall
+	#Tra lai $v0, $a0
+	lw $v0,4($sp)
+	lw $a0,0($sp)
+	addi $sp,$sp,8
+	j EndChooseRequestNumber
+Choose3:
+	addi $t1,$t1,-1
+	bne $t1,$t0,Choose2
+	la $a0,time
+	jal Weekday
+	#Luu tru $a0, $v0
+	addi $sp,$sp,-8
+	sw $a0,0($sp)
+	sw $v0,4($sp)
+	la $a0,newline
+	li $v0,4 #In xau ra man hinh
+	syscall
+	la $a0,stringLuaChon
+	li $v0,4 #In xau ra man hinh
+	syscall
+	la $a0, charRequestNumber
+	li $v0,4    # in ki tu ra nam hinh
+	syscall
+	la $a0,newline
+	li $v0,4 #In xau ra man hinh
+	syscall
+	la $a0,stringKetQua
+	li $v0,4 #In xau ra man hinh
+	syscall
+	#Tra lai $v0, $a0
+	lw $v0,4($sp)
+	lw $a0,0($sp)
+	addi $sp,$sp,8
+	#In ket qua la xau thu trong tuan
+	add $a0,$v0,$0
+	li $v0,4 #In xau ra man hinh
+	syscall
+	j EndChooseRequestNumber
+Choose2:
+	addi $t1,$t1,-1
+	bne $t1,$t0,Choose1
+	ChooseRequestAlphabet:
+		li $v0, 8       #Goi ham nhap 1 ki tu
+		la $a0, charRequestAlphabet        #Tai dia chi de doc
+		li $a1, 2       #Chieu dai cua chuoi la 1 byte va 1 null
+		syscall         #Luu char tu buffer vao charRequest
+		lb $t0,charRequestAlphabet
+
+		#Kiem tra ki tu nhap vao
+		addi $t1,$0,65 #Ki tu "A"
+		slt $t2,$t0,$t1
+		bne $t2,$0,ChooseRequestAlphabet #Ki tu doc vao <65 (nho hon "A")
+		addi $t1,$t1,2 #$t1 la ki tu 67 ("C")
+		slt $t2,$t1,$t0
+		bne $t2,$0,ChooseRequestAlphabet #Ki tu doc vao >67 (lon hon "C")
+	EndChooseRequestAlphabet:
+	add $a1,$0,$t0
+	la $a0,time
+	#jal Convert
+	#Luu tru $a0, $v0
+	addi $sp,$sp,-8
+	sw $a0,0($sp)
+	sw $v0,4($sp)
+	la $a0,newline
+	li $v0,4 #In xau ra man hinh
+	syscall
+	la $a0,stringLuaChon
+	li $v0,4 #In xau ra man hinh
+	syscall
+	la $a0, charRequestNumber
+	li $v0,4    # in ki tu ra nam hinh
+	syscall
+	la $a0, charRequestAlphabet
+	li $v0,4    # in ki tu ra nam hinh
+	syscall
+	la $a0,newline
+	li $v0,4 #In xau ra man hinh
+	syscall
+	la $a0,stringKetQua
+	li $v0,4 #In xau ra man hinh
+	syscall
+	#Tra lai $v0, $a0
+	lw $v0,4($sp)
+	lw $a0,0($sp)
+	addi $sp,$sp,8
+	j EndChooseRequestNumber
+Choose1:
+	#jal 
+	addi $sp,$sp,-8
+	sw $a0,0($sp)
+	sw $v0,4($sp)
+	la $a0,newline
+	li $v0,4 #In xau ra man hinh
+	syscall
+	la $a0,stringLuaChon
+	li $v0,4 #In xau ra man hinh
+	syscall
+	la $a0, charRequestNumber
+	li $v0,4    # in ki tu ra nam hinh
+	syscall
+	la $a0,newline
+	li $v0,4 #In xau ra man hinh
+	syscall
+	la $a0,stringKetQua
+	li $v0,4 #In xau ra man hinh
+	syscall
+	#Tra lai $v0, $a0
+	lw $v0,4($sp)
+	lw $a0,0($sp)
+	addi $sp,$sp,8
+EndChooseRequestNumber:
 	j EndOfFile
 #-----------------------------------------------------------
 
