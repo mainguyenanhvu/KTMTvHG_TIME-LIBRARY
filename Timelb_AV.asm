@@ -15,6 +15,12 @@
 	charRequestAlphabet: .space 2
 	stringLuaChon: .asciiz"Lua chon: "
 	stringKetQua: .asciiz"Ket qua: "
+	
+	# Huan's data section . [newline] duplicated
+	promptDay: .asciiz "Nhap ngay DAY: "
+	promptMonth: .asciiz "Nhap thang MONTH: "
+	promptYear: .asciiz "Nhap nam YEAR: "
+	slash: .asciiz "/"
 .text
 .globl main
 #-----------------------------------------------------------
@@ -243,11 +249,11 @@ EndChooseRequestNumber:
 #-----------------------------------------------------------
 
 #-----------------------------------------------------------
-#Gia su l‡ biÈn time da duoc truyen v‡o thanh ghi $a0
-#$a0: Luu tham so truyen v‡o tu bien time
+#Gia su l√† bi√©n time da duoc truyen v√†o thanh ghi $a0
+#$a0: Luu tham so truyen v√†o tu bien time
 #$v0: Luu ket qua tra ve 
 #$t0: Luu so 10
-#$t1: Luu kÌ tu duoc trÌch ra tu $a0
+#$t1: Luu k√≠ tu duoc tr√≠ch ra tu $a0
 #$t2: Dem vong lap
 #$t3: Luu ket qua tra ve($t3=$t3$t0 + $t1)
 Day:
@@ -276,54 +282,54 @@ sw $t2,0($sp)
 addi $sp,$sp,-4 
 sw $t3,0($sp)
 
-add $t3,$0,$0 #G·n $t3 = 0
-addi $t0,$0,10 #G·n $t0=10
-addi $t2,$0,2 #So kÌ tu trÌch ra 
+add $t3,$0,$0 #G√°n $t3 = 0
+addi $t0,$0,10 #G√°n $t0=10
+addi $t2,$0,2 #So k√≠ tu tr√≠ch ra 
 
 LoopExtractDay:
 	addi $t2,$t2,-1 #Giam buoc lap
-	lb $t1,($a0) #Lay ki tu trong x‚u
-	addi $t1,$t1,-48 # kÌ tu -'0' ra int
-	addi $a0,$a0,1 #Doi vi trÌ tro v‡o kÌ tu
+	lb $t1,($a0) #Lay ki tu trong x√¢u
+	addi $t1,$t1,-48 # k√≠ tu -'0' ra int
+	addi $a0,$a0,1 #Doi vi tr√≠ tro v√†o k√≠ tu
 	mult $t3,$t0 #Nhan $t3 va $t0
 	mflo $t3 #Chuyen $LO vao $t3
 	add $t3,$t3,$t1 ##$t3= $t3 + $t1
-	#Kiem tra dieu kien tho·t: $t2=0
+	#Kiem tra dieu kien tho√°t: $t2=0
 	beq $t2,$0,EndLoopED
 	j LoopExtractDay
 EndLoopED:
 
-#G·n gi· tri cho $v0
+#G√°n gi√° tri cho $v0
 add $v0,$t3,$0
-#Tra lai gi· tri cho $t3
+#Tra lai gi√° tri cho $t3
 lw $t3,0($sp)
 addi $sp,$sp,4
-#Tra lai gi· tri cho $t2
+#Tra lai gi√° tri cho $t2
 lw $t2,0($sp)
 addi $sp,$sp,4 
-#Tra lai gi· tri cho $a0
+#Tra lai gi√° tri cho $a0
 lw $a0,0($sp)
 addi $sp,$sp,4 
-#Tra lai gi· tri cho $t1
+#Tra lai gi√° tri cho $t1
 lw $t1,0($sp)
 addi $sp,$sp,4 
-#Tra lai gi· tri cho $t0
+#Tra lai gi√° tri cho $t0
 lw $t0,0($sp)
 addi $sp,$sp,4 
-#Tra lai gi· tri cho $ra
+#Tra lai gi√° tri cho $ra
 lw $ra,0($sp) 
 addi $sp,$sp,4 
 
-jr $ra #Tro lai h‡m truoc dÛ
+jr $ra #Tro lai h√†m truoc d√≥
 EndDay:
 #-----------------------------------------------------------
 
 #-----------------------------------------------------------
-#Gia su l‡ biÈn time da duoc truyen v‡o thanh ghi $a0
-#$a0: Luu tham so truyen v‡o tu bien time
+#Gia su l√† bi√©n time da duoc truyen v√†o thanh ghi $a0
+#$a0: Luu tham so truyen v√†o tu bien time
 #$v0: Luu ket qua tra ve 
 #$t0: Luu so 10
-#$t1: Luu kÌ tu duoc trÌch ra tu $a0
+#$t1: Luu k√≠ tu duoc tr√≠ch ra tu $a0
 #$t2: Dem vong lap
 #$t3: Luu ket qua tra ve($t3=$t3$t0 + $t1)
 Month:
@@ -352,55 +358,55 @@ sw $t2,0($sp)
 addi $sp,$sp,-4 
 sw $t3,0($sp)
 
-add $t3,$0,$0 #G·n $t3 = 0
-addi $t0,$0,10 #G·n $t0=10
-addi $t2,$0,2 #So kÌ tu trÌch ra 
+add $t3,$0,$0 #G√°n $t3 = 0
+addi $t0,$0,10 #G√°n $t0=10
+addi $t2,$0,2 #So k√≠ tu tr√≠ch ra 
 addi $a0,$a0,3 #Bo qua ngay va dau '/'
 
 LoopExtractMonth:
 	addi $t2,$t2,-1 #Giam buoc lap
-	lb $t1,($a0) #Lay ki tu trong x‚u
-	addi $t1,$t1,-48 # kÌ tu -'0' ra int
-	addi $a0,$a0,1 #Doi vi trÌ tro v‡o kÌ tu
+	lb $t1,($a0) #Lay ki tu trong x√¢u
+	addi $t1,$t1,-48 # k√≠ tu -'0' ra int
+	addi $a0,$a0,1 #Doi vi tr√≠ tro v√†o k√≠ tu
 	mult $t3,$t0 #Nhan $t3 va $t0
 	mflo $t3 #Chuyen $LO vao $t3
 	add $t3,$t3,$t1 ##$t3= $t3 + $t1
-	#Kiem tra dieu kien tho·t: $t2=0
+	#Kiem tra dieu kien tho√°t: $t2=0
 	beq $t2,$0,EndLoopEMonth
 	j LoopExtractMonth
 EndLoopEMonth:
 
-#G·n gi· tri cho $v0
+#G√°n gi√° tri cho $v0
 add $v0,$t3,$0
-#Tra lai gi· tri cho $t3
+#Tra lai gi√° tri cho $t3
 lw $t3,0($sp)
 addi $sp,$sp,4
-#Tra lai gi· tri cho $t2
+#Tra lai gi√° tri cho $t2
 lw $t2,0($sp)
 addi $sp,$sp,4 
-#Tra lai gi· tri cho $a0
+#Tra lai gi√° tri cho $a0
 lw $a0,0($sp)
 addi $sp,$sp,4 
-#Tra lai gi· tri cho $t1
+#Tra lai gi√° tri cho $t1
 lw $t1,0($sp)
 addi $sp,$sp,4 
-#Tra lai gi· tri cho $t0
+#Tra lai gi√° tri cho $t0
 lw $t0,0($sp)
 addi $sp,$sp,4 
-#Tra lai gi· tri cho $ra
+#Tra lai gi√° tri cho $ra
 lw $ra,0($sp) 
 addi $sp,$sp,4 
 
-jr $ra #Tro lai h‡m truoc dÛ
+jr $ra #Tro lai h√†m truoc d√≥
 EndMonth:
 #-----------------------------------------------------------
 
 #-----------------------------------------------------------
-#Gia su l‡ biÈn time da duoc truyen v‡o thanh ghi $a0
-#$a0: Luu tham so truyen v‡o tu bien time
+#Gia su l√† bi√©n time da duoc truyen v√†o thanh ghi $a0
+#$a0: Luu tham so truyen v√†o tu bien time
 #$v0: Luu ket qua tra ve 
 #$t0: Luu so 10
-#$t1: Luu kÌ tu duoc trÌch ra tu $a0
+#$t1: Luu k√≠ tu duoc tr√≠ch ra tu $a0
 #$t2: Dem vong lap
 #$t3: Luu ket qua tra ve($t3=$t3$t0 + $t1)
 Year:
@@ -429,46 +435,46 @@ sw $t2,0($sp)
 addi $sp,$sp,-4 
 sw $t3,0($sp)
 
-add $t3,$0,$0 #G·n $t3 = 0
-addi $t0,$0,10 #G·n $t0=10
-addi $t2,$0,4 #So kÌ tu trÌch ra 
+add $t3,$0,$0 #G√°n $t3 = 0
+addi $t0,$0,10 #G√°n $t0=10
+addi $t2,$0,4 #So k√≠ tu tr√≠ch ra 
 addi $a0,$a0,6 #Bo qua ngay va dau '/'
 
 LoopExtractYear:
 	addi $t2,$t2,-1 #Giam buoc lap
-	lb $t1,($a0) #Lay ki tu trong x‚u
-	addi $t1,$t1,-48 # kÌ tu -'0' ra int
-	addi $a0,$a0,1 #Doi vi trÌ tro v‡o kÌ tu
+	lb $t1,($a0) #Lay ki tu trong x√¢u
+	addi $t1,$t1,-48 # k√≠ tu -'0' ra int
+	addi $a0,$a0,1 #Doi vi tr√≠ tro v√†o k√≠ tu
 	mult $t3,$t0 #Nhan $t3 va $t0
 	mflo $t3 #Chuyen $LO vao $t3
 	add $t3,$t3,$t1 ##$t3= $t3 + $t1
-	#Kiem tra dieu kien tho·t: $t2=0
+	#Kiem tra dieu kien tho√°t: $t2=0
 	beq $t2,$0,EndLoopEYear
 	j LoopExtractYear
 EndLoopEYear:
 
-#G·n gi· tri cho $v0
+#G√°n gi√° tri cho $v0
 add $v0,$t3,$0
-#Tra lai gi· tri cho $t3
+#Tra lai gi√° tri cho $t3
 lw $t3,0($sp)
 addi $sp,$sp,4
-#Tra lai gi· tri cho $t2
+#Tra lai gi√° tri cho $t2
 lw $t2,0($sp)
 addi $sp,$sp,4 
-#Tra lai gi· tri cho $a0
+#Tra lai gi√° tri cho $a0
 lw $a0,0($sp)
 addi $sp,$sp,4 
-#Tra lai gi· tri cho $t1
+#Tra lai gi√° tri cho $t1
 lw $t1,0($sp)
 addi $sp,$sp,4 
-#Tra lai gi· tri cho $t0
+#Tra lai gi√° tri cho $t0
 lw $t0,0($sp)
 addi $sp,$sp,4 
-#Tra lai gi· tri cho $ra
+#Tra lai gi√° tri cho $ra
 lw $ra,0($sp) 
 addi $sp,$sp,4 
 
-jr $ra #Tro lai h‡m truoc dÛ
+jr $ra #Tro lai h√†m truoc d√≥
 EndYear:
 #-----------------------------------------------------------
 
@@ -562,26 +568,26 @@ Sat:
 	la $v0,Saturday
 EndSwitchCaseOfWeekday:
 	
-#Tra lai gi· tri cho $t3
+#Tra lai gi√° tri cho $t3
 lw $t3,0($sp)
 addi $sp,$sp,4
-#Tra lai gi· tri cho $t2
+#Tra lai gi√° tri cho $t2
 lw $t2,0($sp)
 addi $sp,$sp,4 
-#Tra lai gi· tri cho $a0
+#Tra lai gi√° tri cho $a0
 lw $a0,0($sp)
 addi $sp,$sp,4 
-#Tra lai gi· tri cho $t1
+#Tra lai gi√° tri cho $t1
 lw $t1,0($sp)
 addi $sp,$sp,4 
-#Tra lai gi· tri cho $t0
+#Tra lai gi√° tri cho $t0
 lw $t0,0($sp)
 addi $sp,$sp,4 
-#Tra lai gi· tri cho $ra
+#Tra lai gi√° tri cho $ra
 lw $ra,0($sp) 
 addi $sp,$sp,4 
 
-jr $ra #Tro lai h‡m truoc dÛ
+jr $ra #Tro lai h√†m truoc d√≥
 EndWeekday:
 #------------------------------------------------------------------
 
@@ -677,31 +683,455 @@ sw $a1,0($sp)
 EndIfGetTime:
 add $v0,$t2,$0
 
-#Tra lai gi· tri cho $a1
+#Tra lai gi√° tri cho $a1
 lw $a1,0($sp)
 addi $sp,$sp,4  
-#Tra lai gi· tri cho $a0
+#Tra lai gi√° tri cho $a0
 lw $a0,0($sp)
 addi $sp,$sp,4
-#Tra lai gi· tri cho $t3
+#Tra lai gi√° tri cho $t3
 lw $t3,0($sp)
 addi $sp,$sp,4
-#Tra lai gi· tri cho $t2
+#Tra lai gi√° tri cho $t2
 lw $t2,0($sp)
 addi $sp,$sp,4 
-#Tra lai gi· tri cho $t1
+#Tra lai gi√° tri cho $t1
 lw $t1,0($sp)
 addi $sp,$sp,4 
-#Tra lai gi· tri cho $t0
+#Tra lai gi√° tri cho $t0
 lw $t0,0($sp)
 addi $sp,$sp,4 
-#Tra lai gi· tri cho $ra
+#Tra lai gi√° tri cho $ra
 lw $ra,0($sp) 
 addi $sp,$sp,4 
 
-jr $ra #Tro lai h‡m truoc dÛ
+jr $ra #Tro lai h√†m truoc d√≥
 EndGetTime:
 #-----------------------------------------------------------
 
+#-------------------------------- Huan's Function Section ----------------------------------------------
+
+#----------------------- Test Main ----------------------------#
+#main:
+#	# main prolog
+#	
+#	addi $sp, $sp, -4
+#	sw $ra, 0($sp) # push in $ra
+#	addi $sp, $sp, -4
+#	sw $fp, 0($sp) # push in $fp
+#	addi $sp, $sp, -12 # reserved for TIME as STRING
+#	addi $sp, $sp, -4 # reserved for DAY as INT
+#	addi $sp, $sp, -4 # reserved for MONTH as INT
+#	addi $sp, $sp, -4 # reserved for YEAR as INT
+#	add $fp, $sp, $zero # $fp = $sp
+#	
+#	# main body
+#	add $a0, $zero, $fp # $a0 points to [YEAR, MONTH, DAY]
+#	addi $a1, $fp, 12 # $a1 stores address of TIME STRING
+#	jal nhap
+#	add $a0, $zero, $fp # $a0 points to [YEAR, MONTH, DAY]
+#	jal xuat
+#
+#	addi $a0, $fp, 12 # $a1 stores address of TIME STRING
+#	addi $v0, $zero, 4
+#	syscall
+#
+#	# main epilog
+#	addi $sp, $fp, 24 # pop local variables
+#	lw $fp, 0($sp) # pop $fp
+#	addi $sp, $sp, 4
+#	lw $ra, 0($sp) # pop $ra
+#	addi $sp, $sp, 4
+#	addi $v0, $zero, 10
+#	syscall
+#----------------------- End Test Main ----------------------------#
+
+# ----------------------------------------------------------------------
+# FUNCTION: nhap - Input [YEAR, MONTH, DAY] as INT
+# PARAM: $a0 - address of array [YEAR, MONTH, DAY] as INT
+# RETURN: nothing
+# ----------------------------------------------------------------------
+nhap:
+	# nhap prolog
+	addi $sp, $sp, -4
+	sw $ra, 0($sp) # push in $ra
+	addi $sp, $sp, -4
+	sw $fp, 0($sp) # push in $fp
+	addi $sp, $sp, -24 # reserved for character buffer
+	add $fp, $sp, $zero # $fp = $sp
+
+	# nhap body
+	add $t0, $a0, $zero # save $a0 to $t0 as it will be altered
+	readLoop:
+		# read DAY
+		addi $v0, $zero, 4 # print prompt
+		la $a0, promptDay
+		syscall
+		add $a0, $fp, $zero
+		addi $a1, $zero, 3
+		addi $v0, $zero, 8 # read string
+		syscall
+		addi $v0, $zero, 4 # print newline
+		la $a0, newline
+		syscall
+		# read MONTH
+		addi $v0, $zero, 4 # print prompt
+		la $a0, promptMonth
+		syscall
+		addi $a0, $fp, 8
+		addi $a1, $zero, 3
+		addi $v0, $zero, 8 # read string
+		syscall
+		addi $v0, $zero, 4 # print newline
+		la $a0, newline
+		syscall
+		# read YEAR
+		addi $v0, $zero, 4 # print prompt
+		la $a0, promptYear
+		syscall
+		addi $a0, $fp, 16
+		addi $a1, $zero, 5
+		addi $v0, $zero, 8 # read string
+		syscall
+		addi $v0, $zero, 4 # print newline
+		la $a0, newline
+		syscall
+		# check DAY, MONTH, YEAR
+		addi $sp, $sp, -4 # push in $t0
+		sw $t0, 0($sp)
+		add $a0, $fp, $zero # pass in parameter
+		jal check
+		lw $t0, 0($sp) # pop $t0
+		addi $sp, $sp, 4
+		beq $v0, $zero, readLoop
+	
+	# convert DAY, MONTH, YEAR to Int
+		# convert DAY
+		addi $sp, $sp, -4 # push in $t0
+		sw $t0, 0($sp)
+		add $a0, $fp, $zero # pass in parameter
+		jal convertToInt
+		lw $t0, 0($sp) # pop $t0
+		sw $v0, 8($t0)
+		addi $sp, $sp, 4
+		# convert MONTH
+		addi $sp, $sp, -4 # push in $t0
+		sw $t0, 0($sp)
+		addi $a0, $fp, 8 # pass in parameter
+		jal convertToInt
+		lw $t0, 0($sp) # pop $t0
+		sw $v0, 4($t0)
+		addi $sp, $sp, 4
+		# convert to YEAR
+		addi $sp, $sp, -4 # push in $t0
+		sw $t0, 0($sp)
+		addi $a0, $fp, 16 # pass in parameter
+		jal convertToInt
+		lw $t0, 0($sp) # pop $t0
+		sw $v0, 0($t0)
+		addi $sp, $sp, 4
+	
+	# nhap epilog
+	addi $sp, $sp, 24 # pop character buffer
+	lw $fp, 0($sp) # pop $fp
+	addi $sp, $sp, 4
+	lw $ra, 0($sp) # pop $ra
+	addi $sp, $sp, 4
+	jr $ra # return to caller
+
+# [!!! NOTE !!!]: This is a function for TESTING PURPOSE ONLY
+# ----------------------------------------------------------------------
+# FUNCTION: xuat - Output DAY/MONTH/YEAR
+# PARAM: $a0 - address of array [YEAR, MONTH, DAY] as INT
+# RETURN: nothing
+# ----------------------------------------------------------------------
+xuat:
+	# xuat prolog
+	addi $sp, $sp, -4
+	sw $ra, 0($sp) # push in $ra
+	addi $sp, $sp, -4
+	sw $fp, 0($sp) # push in $fp
+	add $fp, $sp, $zero # $fp = $sp
+
+	# xuat body
+	add $t0, $a0, $zero # save $a0 to $t0 as it will be altered
+		# print DAY
+		addi $v0, $zero, 1
+		lw $a0, 8($t0)
+		syscall
+		# add slash
+		addi $v0, $zero, 4
+		la $a0, slash
+		syscall
+		# print MONTH
+		addi $v0, $zero, 1
+		lw $a0, 4($t0)
+		syscall
+		# add slash
+		addi $v0, $zero, 4
+		la $a0, slash
+		syscall
+		# print YEAR
+		addi $v0, $zero, 1
+		lw $a0, 0($t0)
+		syscall
+
+	# xuat epilog
+	lw $fp, 0($sp) # pop $fp
+	addi $sp, $sp, 4
+	lw $ra, 0($sp) # pop $ra
+	addi $sp, $sp, 4
+	jr $ra # return to caller
+
+# ----------------------------------------------------------------------
+# FUNCTION: check - Validate user input
+# PARAM: $a0 - address of array [YEAR, MONTH, DAY] as STRING
+# RETURN: $v0 - [0 - FALSE] [1 - TRUE]
+# ----------------------------------------------------------------------
+check:
+	# check prolog
+	addi $sp, $sp, -4
+	sw $ra, 0($sp) # push in $ra
+	addi $sp, $sp, -4
+	sw $fp, 0($sp) # push in $fp
+	addi $sp, $sp, -4 # DAY
+	addi $sp, $sp, -4 # MONTH
+	addi $sp, $sp, -4 # YEAR
+	add $fp, $sp, $zero # $fp = $sp
+
+	# check body
+	add $t0, $zero, $a0 # save $a0 to $t0 as it will be altered
+	# check for numbers
+		# check DAY
+		addi $sp, $sp, -4 # push $t0
+		sw $t0, 0($sp)
+		add $a0, $t0, $zero
+		jal checkNumber
+		lw $t0, 0($sp) # pop $t0
+		addi $sp, $sp, 4
+		beq $v0, $zero, checkFailure
+		# check MONTH
+		addi $sp, $sp, -4 # push $t0
+		sw $t0, 0($sp)
+		addi $a0, $t0, 8
+		jal checkNumber
+		lw $t0, 0($sp) # pop $t0
+		addi $sp, $sp, 4
+		beq $v0, $zero, checkFailure
+		# check YEAR
+		addi $sp, $sp, -4 # push $t0
+		sw $t0, 0($sp)
+		addi $a0, $t0, 16
+		jal checkNumber
+		lw $t0, 0($sp) # pop $t0
+		addi $sp, $sp, 4
+		beq $v0, $zero, checkFailure
+		
+	# convert DAY, MONTH, YEAR to Int
+		# convert DAY
+		addi $sp, $sp, -4 # push $t0
+		sw $t0, 0($sp)
+		add $a0, $t0, $zero # pass in parameter
+		jal convertToInt
+		sw $v0, 8($fp)
+		lw $t0, 0($sp) # pop $t0
+		addi $sp, $sp, 4
+		# convert MONTH
+		addi $sp, $sp, -4 # push $t0
+		sw $t0, 0($sp)
+		addi $a0, $t0, 8 # pass in parameter
+		jal convertToInt
+		sw $v0, 4($fp)
+		lw $t0, 0($sp) # pop $t0
+		addi $sp, $sp, 4
+		# convert to YEAR
+		addi $sp, $sp, -4 # push $t0
+		sw $t0, 0($sp)
+		addi $a0, $t0, 16 # pass in parameter
+		jal convertToInt
+		sw $v0, 0($fp)
+		lw $t0, 0($sp) # pop $t0
+		addi $sp, $sp, 4
+	# check MONTH value
+	lw $t0, 4($fp) # load MONTH value
+	slti $t1, $t0, 13
+	beq $t1, $zero, checkFailure
+	slt $t1, $zero, $t0
+	beq $t1, $zero, checkFailure
+	
+	# check DAY value
+	lw $a0, 4($fp) # load MONTH value to parameter $a0
+	lw $a1, 0($fp) # load YEAR value to parameter $a1
+	jal dayInMonth
+	lw $t0, 8($fp) # load DAY value
+	slt $t1, $zero, $t0
+	beq $t1, $zero, checkFailure
+	slt $t1, $v0, $t0
+	bne $t1, $zero, checkFailure
+	
+	addi $v0, $zero, 1
+	j checkEnd
+	checkFailure:
+	add $v0, $zero, $zero
+	
+	# check epilog
+	checkEnd:
+	addi $sp, $sp, 12 # pop local variables
+	lw $fp, 0($sp) # pop $fp
+	addi $sp, $sp, 4
+	lw $ra, 0($sp) # pop $ra
+	addi $sp, $sp, 4
+	jr $ra # return to caller
+
+# ----------------------------------------------------------------------
+# FUNCTION: convertToInt - Convert VALID STRING to INT
+# PARAM: $a0 - address of STRING
+# RETURN: $v0 - INT result
+# ----------------------------------------------------------------------
+convertToInt:
+	# convertToInt prolog
+	addi $sp, $sp, -4
+	sw $ra, 0($sp) # push in $ra
+	addi $sp, $sp, -4
+	sw $fp, 0($sp) # push in $fp
+	add $fp, $sp, $zero # $fp = $sp
+
+	# convertToInt body
+	add $t0, $zero, $zero
+	addi $t1, $zero, 10
+	convertLoop:
+		lb $t2, 0($a0)
+		beq $t2, $zero, endConvertLoop
+		beq $t2, $t1, endConvertLoop
+		addi $t2, $t2, -48
+		mult $t0, $t1
+		mflo $t0
+		add $t0, $t0, $t2
+		addi $a0, $a0, 1
+		j convertLoop
+	endConvertLoop:
+	add $v0, $zero, $t0
+
+	# convertToInt epilog
+	lw $fp, 0($sp) # pop $fp
+	addi $sp, $sp, 4
+	lw $ra, 0($sp) # pop $ra
+	addi $sp, $sp, 4
+	jr $ra # return to caller
+
+# ----------------------------------------------------------------------
+# FUNCTION: checkNumber - Check if a STRING can be converted to INT or not
+# PARAM: $a0 - address of STRING
+# RETURN: $v0 - [0 - FALSE] [1 - TRUE]
+# ----------------------------------------------------------------------
+checkNumber:
+	# checkNumber prolog
+	addi $sp, $sp, -4 # push in $ra
+	sw $ra, 0($sp)
+	addi $sp, $sp, -4 # push in $fp
+	sw $fp, 0($sp)
+	add $fp, $sp, $zero # $fp = $sp
+
+	# checkNumber body
+	add $t0, $a0, $zero
+	addi $t1, $zero, 48
+	addi $t2, $zero, 57
+	addi $t3, $zero, 10
+	addi $v0, $zero, 1
+	checkNumberLoop:
+		lb $t4, 0($a0)
+		beq $t4, $zero, checkNumberEnd
+		beq $t4, $t3, checkNumberEnd
+		slt $t5, $t4, $t1
+		bne $t5, $zero, checkNumberFailure
+		slt $t5, $t2, $t4
+		bne $t5, $zero, checkNumberFailure
+		addi $a0, $a0, 1
+		j checkNumberLoop
+	checkNumberFailure:
+	add $v0, $zero, $zero
+
+	# checkNumber epilog
+	checkNumberEnd:
+	lw $fp, 0($sp) # pop $fp
+	addi $sp, $sp, 4
+	lw $ra, 0($sp) # pop $ra
+	addi $sp, $sp, 4
+	jr $ra
+
+# ----------------------------------------------------------------------
+# FUNCTION: dayInMonth - Calculate number of days in a specific MONTH & YEAR
+# PARAM: $a0 - MONTH as INT, $a1 - YEAR as INT
+# RETURN: $v0 - Number of days in that MONTH & YEAR
+# ----------------------------------------------------------------------
+dayInMonth:
+	# dayInMonth prolog
+	addi $sp, $sp, -4 # push in $ra
+	sw $ra, 0($sp)
+	addi $sp, $sp, -4 # push in $fp
+	sw $fp, 0($sp)
+	add $fp, $sp, $zero # $fp = $sp
+
+	# dayInMonth body
+	add $t0, $zero, $zero
+	addi $t1, $zero, 400
+	addi $t2, $zero, 4
+	addi $t3, $zero, 100
+	div $a1, $t1 # if YEAR % 400 == 0, then it's a LEAP YEAR
+	mfhi $t4
+	beq $t4, $zero, DIM_isLYear
+	div $a1, $t2 # else if YEAR % 4 == 0
+	mfhi $t4
+	div $a1, $t3 # and YEAR % 100 != 0, then it's a LEAP YEAR
+	mfhi $t5
+	bne $t4, $zero, DIM_notLYear
+	beq $t5, $zero, DIM_notLYear
+	DIM_isLYear:
+	addi $t0, $zero, 1
+	DIM_notLYear:
+	j calDIM
+
+	calDIM:
+	addi $a0, $a0, -1
+	beq $a0, $zero, DIM_31 # January
+	addi $a0, $a0, -1
+	beq $a0, $zero, DIM_28 # February
+	addi $a0, $a0, -1
+	beq $a0, $zero, DIM_31 # March
+	addi $a0, $a0, -1
+	beq $a0, $zero, DIM_30 # April
+	addi $a0, $a0, -1
+	beq $a0, $zero, DIM_31 # May
+	addi $a0, $a0, -1
+	beq $a0, $zero, DIM_30 # June
+	addi $a0, $a0, -1
+	beq $a0, $zero, DIM_31 # July
+	addi $a0, $a0, -1
+	beq $a0, $zero, DIM_31 # August
+	addi $a0, $a0, -1
+	beq $a0, $zero, DIM_30 # September
+	addi $a0, $a0, -1
+	beq $a0, $zero, DIM_31 # October
+	addi $a0, $a0, -1
+	beq $a0, $zero, DIM_30 # November
+	addi $a0, $a0, -1
+	beq $a0, $zero, DIM_31 # December
+
+	DIM_30:
+	addi $v0, $zero, 30
+	j DIM_End
+	DIM_31:
+	addi $v0, $zero, 31
+	j DIM_End
+	DIM_28:
+	addi $v0, $t0, 28
+	
+	# dayInMonth epilog
+	DIM_End:
+	lw $fp, 0($sp) # pop $fp
+	addi $sp, $sp, 4
+	lw $ra, 0($sp) # pop $ra
+	addi $sp, $sp, 4
+	jr $ra
 
 EndOfFile:
