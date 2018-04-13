@@ -10,7 +10,7 @@
 	Saturday: .asciiz"Sat"
 	Sunday: .asciiz"Sun"
 	newline: .asciiz"\n"
-	startAnnounce: .asciiz" 1. Xuat chuoi TIME theo dinh dang DD/MM/YYYY \n 2. Chuyen doi chuoi TIME thanh mot trong cac dinh dang sau: \n     A. MM/DD/YYYY \n     B. Month DD, YYYY \n     C. DD Month, YYYY \n 3. Cho biet ngay vua nhap la ngay thu may trong tuan: \n 4. Kiem tra nam trong chuoi TIME co phai la nam nhuan khong \n 5. Cho biet khoang thoi gian giua chuoi TIME_1 va TIME_2 \n 6. Cho biet 2 nam nhuan gan nhat voi nam trong chuoi time \n"
+	startAnnounce: .asciiz" ------------Ban hay chon 1 trong cac thao tac duoi day------------ \n 1. Xuat chuoi TIME theo dinh dang DD/MM/YYYY \n 2. Chuyen doi chuoi TIME thanh mot trong cac dinh dang sau: \n     A. MM/DD/YYYY \n     B. Month DD, YYYY \n     C. DD Month, YYYY \n 3. Cho biet ngay vua nhap la ngay thu may trong tuan: \n 4. Kiem tra nam trong chuoi TIME co phai la nam nhuan khong \n 5. Cho biet khoang thoi gian giua chuoi TIME_1 va TIME_2 \n 6. Cho biet 2 nam nhuan gan nhat voi nam trong chuoi time \n"
 	charRequestNumber: .space 2
 	charRequestAlphabet: .space 2
 	stringLuaChon: .asciiz"Lua chon: "
@@ -79,9 +79,30 @@ Choose5:
 	addi $t1,$t1,-1
 	bne $t1,$t0,Choose4
 	#jal Nhap time1
+	  addi $sp, $sp, -12 # Allocate space for [Y, M, D] array on stack
+	  add $a0, $zero, $sp
+	  jal nhap
+	  lw $a2, 0($a0) # Save YEAR to $a2
+	  lw $a1, 4($a0) # Save MONTH to $a1
+	  lw $a0, 8($a0) # Save DAY to $a0
+	  addi $sp, $sp, 12 # Deallocate space for [Y, M, D] array
+	  addi $sp, $sp, -12 # Allocate space for DD/MM/YYYY string
+	  add $a3, $sp, $zero # $a3 = Address of DD/MM/YYYY string
+	  jal Date
 	#jal Nhap time2
-	la $a0,time1 #($v0)
-	la $a1,time2 #($v1)
+	  addi $sp, $sp, -12 # Allocate space for [Y, M, D] array on stack
+	  add $a0, $zero, $sp
+	  jal nhap
+	  lw $a2, 0($a0) # Save YEAR to $a2
+	  lw $a1, 4($a0) # Save MONTH to $a1
+	  lw $a0, 8($a0) # Save DAY to $a0
+	  addi $sp, $sp, 12 # Deallocate space for [Y, M, D] array
+	  addi $sp, $sp, -12 # Allocate space for DD/MM/YYYY string
+	  add $a3, $sp, $zero # $a3 = Address of DD/MM/YYYY string
+	  jal Date
+	  add $v1, $v0, $zero
+	la $a0, $v0
+	la $a1, $v1
 	jal GetTime
 	#Luu tru $a0, $v0
 	addi $sp,$sp,-8
@@ -222,6 +243,7 @@ Choose2:
 	j EndChooseRequestNumber
 Choose1:
 	#jal 
+	bne $t1,$t0,ChooseRequestNumber
 	addi $sp,$sp,-8
 	sw $a0,0($sp)
 	sw $v0,4($sp)
