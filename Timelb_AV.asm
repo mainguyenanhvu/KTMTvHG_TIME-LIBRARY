@@ -1,4 +1,4 @@
-.data #,a
+.data 
 	time: .asciiz"04/04/2018"
 	time1: .asciiz"28/02/2018"
 	time2: .asciiz"29/02/2016"
@@ -21,6 +21,21 @@
 	promptMonth: .asciiz "Nhap thang MONTH: "
 	promptYear: .asciiz "Nhap nam YEAR: "
 	slash: .asciiz "/"
+	
+	#Dat's data
+	error: .asciiz"Error!"
+	january: .asciiz"January"
+	ferbuary: .asciiz"Ferbuary"
+	march: .asciiz"March"
+	april: .asciiz"April"
+	may: .asciiz"May"
+	june: .asciiz"June"
+	july: .asciiz"July"
+	august: .asciiz "August"
+	september: .asciiz"September"
+	october: .asciiz"October"
+	november: .asciiz"November"
+	december: .asciiz"December"
 .text
 .globl main
 #-----------------------------------------------------------
@@ -1188,5 +1203,758 @@ dayInMonth:
 	lw $ra, 0($sp) # pop $ra
 	addi $sp, $sp, 4
 	jr $ra
+#**********************************************************************
+#******************************Dat's Function**************************
+#**********************************************************************
+#_________________Ham IsLeapYear_____________________
+#$a0: nam can kiem tra
+# $v0==1 True, $v0==0 False
+IsLeapYear: 
+addi $sp,$sp,-24
+sw $ra, 20($sp)
+sw $t0, 16($sp)
+sw $t1, 12($sp)
+sw $t2, 8($sp)
+sw $t3, 4($sp)
+sw $t4, ($sp)
+
+add $t0, $0, $a0
+addi $t1, $0, 4
+addi $t2,$0, 100
+addi $t3,$0, 400
+
+div $t0, $t3
+mfhi $t4
+ beq $t4, $0, Div400True
+div $t0, $t1
+mfhi $t4
+beq $t4, $0, Div4True
+addi $v0, $0, 0
+j EndIsLeapYear
+Div400True:
+	addi $v0, $0, 1
+	j EndIsLeapYear
+Div4True:
+	div $t0, $t2
+	mfhi $t4
+	beq $t4, $0, Div100True
+	addi $v0, $0, 1
+	j EndIsLeapYear
+Div100True:
+	addi $v0, $0, 0
+EndIsLeapYear:
+lw $ra, 20($sp)
+lw $t0, 16($sp)
+lw $t1, 12($sp)
+lw $t2, 8($sp)
+lw $t3, 4($sp)
+lw $t4, ($sp)
+addi $sp,$sp,24
+jr $ra
+
+#_________________Ham LeapYear_____________________
+#$a0: Chuoi time
+#$v0: 1 true, 0 false
+LeapYear:
+addi $sp, $sp, -8
+sw $ra, 4($sp)
+sw $t0, ($sp)
+jal Year
+add $a0, $v0, $0
+jal IsLeapYear
+EndLeapYear:
+lw $ra, 4($sp)
+lw $t0, ($sp)
+addi $sp, $sp, 8
+jr $ra
+
+
+#_________________Ham LeapYearNext_____________________
+#$a0: chuoi time
+#v0: nam nhuan ke tiep cua nam hien hanh
+LeapYearNext:
+addi $sp, $sp, -8
+sw $ra, 4($sp)
+sw $t0, ($sp)
+
+jal Year
+add $t0,$v0,$0
+addi $t0, $t0, 1
+LoopFindNextYear:
+	add $a0,$t0,$0
+	jal IsLeapYear
+	bgtz $v0, EndLoopFindNextYear
+	addi $t0, $t0, 1
+	j LoopFindNextYear
+EndLoopFindNextYear:
+	add $v0, $a0,$0
+EndLeapYearNext:
+lw $ra, 4($sp)
+lw $t0, ($sp)
+addi $sp, $sp, 8
+jr $ra
+#_________________Ham Date_____________________
+#$a0 day, $a1 month, $a2 year, $a3 dia chi cua chuoi can luu
+#$t1 l?u ch? so dau, $t2 luu chu so sau
+Date:
+addi $sp,$sp,-28
+sw $ra, 20($sp)
+sw $t0, 16($sp)
+sw $t1, 12($sp)
+sw $t2, 8($sp)
+sw $t3, 4($sp)
+sw $t4, ($sp)
+sw $t5, 24($sp)
+
+addi $t0 $0, 32
+div $a0, $t0
+mflo $t4
+bne $t4, $0, Error
+addi $t0 $0, 13
+div $a1, $t0
+mflo $t4
+bne $t4, $0, Error
+addi $t0 $0, 10000
+div $a2, $t0
+mflo $t4
+bne $t4, $0, Error
+
+
+#Chia day so nguyen thanh chuoi
+addi $t0, $0, 10
+div $a0, $t0
+mflo $t1
+mfhi $t2
+addi $t1, $t1, 48
+addi $t2, $t2, 48
+addi $t4, $0, 47 #Ky tu /
+sb $t1, ($a3)
+sb $t2, 1($a3)
+sb $t4, 2($a3)
+#Chi month so nguyen thanh chuoi
+div $a1, $t0
+mflo $t1
+mfhi $t2
+addi $t1, $t1, 48
+addi $t2, $t2, 48
+addi $t4, $0, 47 #Ky tu /
+sb $t1, 3($a3)
+sb $t2, 4($a3)
+sb $t4, 5($a3)
+
+addi $t1, $a2, 0
+addi $t2, $0, 10
+add $t3, $a3,$0
+addi $t3, $t3, 6
+addi $t5,$0, 4
+LoopYear: ##Chia Year thanh cac chu so
+	addi $t5,$t5, -1
+	div $t1, $t2
+	mfhi $t4
+	mflo $t1
+	add $sp, $sp, -4
+	sw $t4, ($sp)
+	beq $t5, $0, EndLoopYear
+	j LoopYear
+EndLoopYear:
+	addi $t5,$0, 4
+ConvertYear:
+	lw $t4, ($sp)
+	addi $sp, $sp, 4
+	addi $t4, $t4, 48
+	sb $t4, ($t3)
+	addi $t3, $t3, 1
+	addi $t5, $t5, -1
+	beq $t5, $0, EndConvertYear
+	j ConvertYear
+EndConvertYear:
+	add $t4, $0, $0
+	sb $t4, ($t3)
+	j EndDate
+Error:
+addi $t1, $0, 48
+addi $t2, $0, 48
+addi $t4, $0, 47 #Ky tu /
+sb $t1, ($a3)
+sb $t2, 1($a3)
+sb $t4, 2($a3)
+sb $t1, 3($a3)
+sb $t2, 4($a3)
+sb $t4, 5($a3)
+sb $t1, 6($a3)
+sb $t2, 7($a3)
+sb $t1, 8($a3)
+sb $t2, 9($a3)
+addi $t1, $0, 0
+sb $t1, 10($a3)
+EndDate:
+lw $ra, 20($sp)
+lw $t0, 16($sp)
+lw $t1, 12($sp)
+lw $t2, 8($sp)
+lw $t3, 4($sp)
+lw $t4, ($sp)
+lw $t5, 24($sp)
+addi $sp,$sp,28
+add $v0, $a3, $0
+jr $ra
+
+#_____CopyString_____
+#a0: string, a1:des string
+CopyString:
+addi $sp,$sp, -12
+sw $ra, 8($sp)
+sw $t0, 4($sp)
+sw $t1, 0($sp)
+
+add $t1, $a0, $0
+add $v0, $a1, $0
+lb $t0, ($t1)
+LoopCopyString:
+	beq $t0, $0, EndLoopCopyString
+	sb $t0,($v0)
+	addi $t1, $t1, 1
+	addi $v0, $v0, 1
+	lb $t0, ($t1)
+	j LoopCopyString
+EndLoopCopyString:
+	sb $t0,($v0)
+	add $t0, $v0, $0
+	add $v0, $a1, $0
+	add $a1, $t0,$0
+EndCopyString:
+lw $ra, 8($sp)
+lw $t0, 4($sp)
+lw $t1, 0($sp)
+addi $sp,$sp, 12
+jr $ra
+#___________________Ham DateA____________________
+DateA:
+addi $sp,$sp,-28
+sw $ra, 20($sp)
+sw $t0, 16($sp)
+sw $t1, 12($sp)
+sw $t2, 8($sp)
+sw $t3, 4($sp)
+sw $t4, ($sp)
+sw $t5, 24($sp)
+
+addi $t0 $0, 32
+div $a0, $t0
+mflo $t4
+bne $t4, $0, ErrorDateA
+addi $t0 $0, 13
+div $a1, $t0
+mflo $t4
+bne $t4, $0, ErrorDateA
+addi $t0 $0, 10000
+div $a2, $t0
+mflo $t4
+bne $t4, $0, Error
+
+
+#Chia day so nguyen thanh chuoi
+addi $t0, $0, 10
+div $a1, $t0
+mflo $t1
+mfhi $t2
+addi $t1, $t1, 48
+addi $t2, $t2, 48
+addi $t4, $0, 47 #Ky tu /
+sb $t1, ($a3)
+sb $t2, 1($a3)
+sb $t4, 2($a3)
+#Chi month so nguyen thanh chuoi
+div $a0, $t0
+mflo $t1
+mfhi $t2
+addi $t1, $t1, 48
+addi $t2, $t2, 48
+addi $t4, $0, 47 #Ky tu /
+sb $t1, 3($a3)
+sb $t2, 4($a3)
+sb $t4, 5($a3)
+
+addi $t1, $a2, 0
+addi $t2, $0, 10
+add $t3, $a3,$0
+addi $t3, $t3, 6
+addi $t5,$0, 4
+LoopYearDateA: ##Chia Year thanh cac chu so
+	addi $t5,$t5, -1
+	div $t1, $t2
+	mfhi $t4
+	mflo $t1
+	add $sp, $sp, -4
+	sw $t4, ($sp)
+	beq $t5, $0, EndLoopYearDateA
+	j LoopYearDateA
+EndLoopYearDateA:
+	addi $t5,$0, 4
+ConvertYearDateA:
+	lw $t4, ($sp)
+	addi $sp, $sp, 4
+	addi $t4, $t4, 48
+	sb $t4, ($t3)
+	addi $t3, $t3, 1
+	addi $t5, $t5, -1
+	beq $t5, $0, EndConvertYearDateA
+	j ConvertYearDateA
+EndConvertYearDateA:
+	add $t4, $0, $0
+	sb $t4, ($t3)
+	j EndDateDateA
+ErrorDateA:
+addi $t1, $0, 48
+addi $t2, $0, 48
+addi $t4, $0, 47 #Ky tu /
+sb $t1, ($a3)
+sb $t2, 1($a3)
+sb $t4, 2($a3)
+sb $t1, 3($a3)
+sb $t2, 4($a3)
+sb $t4, 5($a3)
+sb $t1, 6($a3)
+sb $t2, 7($a3)
+sb $t1, 8($a3)
+sb $t2, 9($a3)
+addi $t1, $0, 0
+sb $t1, 10($a3)
+EndDateDateA:
+lw $ra, 20($sp)
+lw $t0, 16($sp)
+lw $t1, 12($sp)
+lw $t2, 8($sp)
+lw $t3, 4($sp)
+lw $t4, ($sp)
+lw $t5, 24($sp)
+addi $sp,$sp,28
+add $v0, $a3, $0
+jr $ra
+
+
+#_______DateB______
+#a0: day, a1: month, a2: year,a3: string to store data
+DateB:
+addi $sp,$sp,-28
+sw $ra, 20($sp)
+sw $t0, 16($sp)
+sw $t1, 12($sp)
+sw $t2, 8($sp)
+sw $t3, 4($sp)
+sw $t4, ($sp)
+sw $t5, 24($sp)
+
+addi $t0 $0, 32
+div $a0, $t0
+mflo $t4
+bne $t4, $0, ErrorDateB
+addi $t0 $0, 13
+div $a1, $t0
+mflo $t4
+bne $t4, $0, ErrorDateB
+addi $t0 $0, 10000
+div $a2, $t0
+mflo $t4
+bne $t4, $0, ErrorDateB
+
+
+add $t0, $a3, $0
+add $t2, $a0, $0
+add $t3, $a1, $0
+add $t4, $a2, $0
+
+addi $t1, $0, 1
+
+beq $t1, $a1, Thang1
+addi $t1, $t1, 1
+beq $t1, $a1, Thang2
+addi $t1, $t1, 1
+beq $t1, $a1, Thang3
+addi $t1, $t1, 1
+beq $t1, $a1, Thang4
+addi $t1, $t1, 1
+beq $t1, $a1, Thang5
+addi $t1, $t1, 1
+beq $t1, $a1, Thang6
+addi $t1, $t1, 1
+beq $t1, $a1, Thang7
+addi $t1, $t1, 1
+beq $t1, $a1, Thang8
+addi $t1, $t1, 1
+beq $t1, $a1, Thang9
+addi $t1, $t1, 1
+beq $t1, $a1, Thang10
+addi $t1, $t1, 1
+beq $t1, $a1, Thang11
+addi $t1, $t1, 1
+beq $t1, $a1, Thang12
+j ErrorDateB
+
+Thang1:
+la $a0, january
+j ProcessDateB
+Thang2:
+la $a0, ferbuary
+j ProcessDateB
+Thang3:
+la $a0, march
+j ProcessDateB
+Thang4:
+la $a0, april
+j ProcessDateB
+Thang5:
+la $a0, may
+j ProcessDateB
+Thang6:
+la $a0, june
+j ProcessDateB
+Thang7:
+la $a0, july
+j ProcessDateB
+Thang8:
+la $a0, august
+j ProcessDateB
+Thang9:
+la $a0, september
+j ProcessDateB
+Thang10:
+la $a0, october
+j ProcessDateB
+Thang11:
+la $a0, november
+j ProcessDateB
+Thang12:
+la $a0, december
+j ProcessDateB
+
+ProcessDateB:
+add $a1, $a3,$0
+jal CopyString
+add $a3, $a1, $0
+
+add $a0, $t2, $0
+add $a1, $t3, $0
+add $a2, $t4, $0
+
+addi $t1, $0, 32 #Ky tu khoang trang
+sb $t1, ($a3)
+
+addi $t1, $0, 10
+div $a0, $t1
+mflo $t2
+mfhi $t3
+addi $t2, $t2, 48
+addi $t3, $t3, 48
+sb $t2, 1($a3)
+sb $t3, 2($a3)
+addi $t1, $0, 44
+sb $t1, 3($a3)
+
+addi $t1, $a2, 0
+addi $t2, $0, 10
+add $t3, $a3,$0
+addi $t3, $t3, 4
+addi $t5,$0, 4
+LoopYearDateB: #Chia Year thanh cac chu so
+	addi $t5,$t5, -1
+	div $t1, $t2
+	mfhi $t4
+	mflo $t1
+	add $sp, $sp, -4
+	sw $t4, ($sp)
+	beq $t5, $0, EndLoopYearDateB
+	j LoopYearDateB
+EndLoopYearDateB:
+	addi $t5,$0, 4
+ConvertYearDateB:
+	lw $t4, ($sp)
+	addi $sp, $sp, 4
+	addi $t4, $t4, 48
+	sb $t4, ($t3)
+	addi $t3, $t3, 1
+	addi $t5, $t5, -1
+	beq $t5, $0, EndConvertYearDateB
+	j ConvertYearDateB
+EndConvertYearDateB:
+	add $t4, $0, $0
+	sb $t4, ($t3)
+	add $a3, $t0, $0
+	add $v0, $t0, $0
+	j EndDateB
+ErrorDateB:
+addi $t1, $0, 48
+addi $t2, $0, 48
+addi $t4, $0, 47 #Ky tu /
+sb $t1, ($a3)
+sb $t2, 1($a3)
+sb $t4, 2($a3)
+sb $t1, 3($a3)
+sb $t2, 4($a3)
+sb $t4, 5($a3)
+sb $t1, 6($a3)
+sb $t2, 7($a3)
+sb $t1, 8($a3)
+sb $t2, 9($a3)
+addi $t1, $0, 0
+sb $t1, 10($a3)
+
+EndDateB:
+lw $ra, 20($sp)
+lw $t0, 16($sp)
+lw $t1, 12($sp)
+lw $t2, 8($sp)
+lw $t3, 4($sp)
+lw $t4, ($sp)
+lw $t5, 24($sp)
+addi $sp,$sp,28
+jr $ra
+
+#__________Ham DateC____________
+DateC:
+addi $sp,$sp,-28
+sw $ra, 20($sp)
+sw $t0, 16($sp)
+sw $t1, 12($sp)
+sw $t2, 8($sp)
+sw $t3, 4($sp)
+sw $t4, ($sp)
+sw $t5, 24($sp)
+
+addi $t0 $0, 32
+div $a0, $t0
+mflo $t4
+bne $t4, $0, ErrorDateC
+addi $t0 $0, 13
+div $a1, $t0
+mflo $t4
+bne $t4, $0, ErrorDateC
+addi $t0 $0, 10000
+div $a2, $t0
+mflo $t4
+bne $t4, $0, ErrorDateC
+
+
+addi $t1, $0, 10
+div $a0, $t1
+mflo $t2
+mfhi $t3
+addi $t2, $t2, 48
+addi $t3, $t3, 48
+sb $t2, 0($a3)
+sb $t3, 1($a3)
+addi $t1, $0, 32 #Ky tu khoang trang
+sb $t1, 2($a3)
+
+add $t0, $a3, $0
+add $t2, $a0, $0
+add $t3, $a1, $0
+add $t4, $a2, $0
+
+addi $t1, $0, 1
+
+beq $t1, $a1, Thang1C
+addi $t1, $t1, 1
+beq $t1, $a1, Thang2C
+addi $t1, $t1, 1
+beq $t1, $a1, Thang3C
+addi $t1, $t1, 1
+beq $t1, $a1, Thang4C
+addi $t1, $t1, 1
+beq $t1, $a1, Thang5C
+addi $t1, $t1, 1
+beq $t1, $a1, Thang6C
+addi $t1, $t1, 1
+beq $t1, $a1, Thang7C
+addi $t1, $t1, 1
+beq $t1, $a1, Thang8C
+addi $t1, $t1, 1
+beq $t1, $a1, Thang9C
+addi $t1, $t1, 1
+beq $t1, $a1, Thang10C
+addi $t1, $t1, 1
+beq $t1, $a1, Thang11C
+addi $t1, $t1, 1
+beq $t1, $a1, Thang12C
+j ErrorDateC
+
+Thang1C:
+la $a0, january
+j ProcessDateC
+Thang2C:
+la $a0, ferbuary
+j ProcessDateC
+Thang3C:
+la $a0, march
+j ProcessDateC
+Thang4C:
+la $a0, april
+j ProcessDateC
+Thang5C:
+la $a0, may
+j ProcessDateC
+Thang6C:
+la $a0, june
+j ProcessDateC
+Thang7C:
+la $a0, july
+j ProcessDateC
+Thang8C:
+la $a0, august
+j ProcessDateC
+Thang9C:
+la $a0, september
+j ProcessDateC
+Thang10C:
+la $a0, october
+j ProcessDateC
+Thang11C:
+la $a0, november
+j ProcessDateC
+Thang12C:
+la $a0, december
+j ProcessDateC
+
+ProcessDateC:
+add $a1, $a3,3
+jal CopyString
+add $a3, $a1, $0
+
+add $a0, $t2, $0
+add $a1, $t3, $0
+add $a2, $t4, $0
+
+addi $t1, $0, 44 #Ky tu ,
+sb $t1, ($a3)
+
+
+
+addi $t1, $a2, 0
+addi $t2, $0, 10
+add $t3, $a3,$0
+addi $t3, $t3, 1
+addi $t5,$0, 4
+LoopYearDateC: #Chia Year thanh cac chu so
+	addi $t5,$t5, -1
+	div $t1, $t2
+	mfhi $t4
+	mflo $t1
+	add $sp, $sp, -4
+	sw $t4, ($sp)
+	beq $t5, $0, EndLoopYearDateC
+	j LoopYearDateC
+EndLoopYearDateC:
+	addi $t5,$0, 4
+ConvertYearDateC:
+	lw $t4, ($sp)
+	addi $sp, $sp, 4
+	addi $t4, $t4, 48
+	sb $t4, ($t3)
+	addi $t3, $t3, 1
+	addi $t5, $t5, -1
+	beq $t5, $0, EndConvertYearDateC
+	j ConvertYearDateC
+EndConvertYearDateC:
+	add $t4, $0, $0
+	sb $t4, ($t3)
+	add $a3, $t0, $0
+	add $v0, $t0, $0
+	j EndDateC
+ErrorDateC:
+addi $t1, $0, 48
+addi $t2, $0, 48
+addi $t4, $0, 47 #Ky tu /
+sb $t1, ($a3)
+sb $t2, 1($a3)
+sb $t4, 2($a3)
+sb $t1, 3($a3)
+sb $t2, 4($a3)
+sb $t4, 5($a3)
+sb $t1, 6($a3)
+sb $t2, 7($a3)
+sb $t1, 8($a3)
+sb $t2, 9($a3)
+addi $t1, $0, 0
+sb $t1, 10($a3)
+
+EndDateC:
+lw $ra, 20($sp)
+lw $t0, 16($sp)
+lw $t1, 12($sp)
+lw $t2, 8($sp)
+lw $t3, 4($sp)
+lw $t4, ($sp)
+lw $t5, 24($sp)
+addi $sp,$sp,28
+jr $ra
+
+#______Ham Convert________
+#$a0: chuoi time
+#$a1: type
+#$a2: Chuoi luu ket qua tra ve
+Convert:
+addi $sp, $sp, -20
+sw $ra, 16($sp)
+sw $t0, 12($sp)
+sw $t1, 8($sp)
+sw $t2, 4($sp)
+sw $t3, 0($sp)
+
+
+add $t0, $a0,$0
+add $t1, $a1, $0
+add $t2, $a2, $0
+
+
+jal Month
+add $a1, $v0, $0
+jal Year
+add $a2, $v0, $0
+jal Day
+add $a0, $v0, $0
+add $a3, $t2, $0
+
+addi $t3, $0, 65
+beq $t1, $t3, TypeA
+addi $t3, $0, 66
+beq $t1, $t3, TypeB
+addi $t3, $0, 67
+beq $t1, $t3, TypeC
+
+addi $t3, $0, 97
+beq $t1, $t3, TypeA
+addi $t3, $0, 98
+beq $t1, $t3, TypeB
+addi $t3, $0, 99
+beq $t1, $t3, TypeC
+j ErrorConvert
+ 
+TypeA:
+jal DateA
+j ProcessConvert
+TypeB:
+jal DateB
+j ProcessConvert
+TypeC:
+jal DateC
+j ProcessConvert
+
+ErrorConvert:
+la $a0, error
+add $a1, $t2,$0
+jal CopyString
+ProcessConvert:
+add $a2,$v0, $0
+add $a0, $t0,$0
+add $a1, $t1, $0
+add $v0,$a2, $0
+EndConvert:
+lw $ra, 16($sp)
+lw $t0, 12($sp)
+lw $t1, 8($sp)
+lw $t2, 4($sp)
+lw $t3, 0($sp)
+addi $sp, $sp, 20
+jr $ra
 
 EndOfFile:
