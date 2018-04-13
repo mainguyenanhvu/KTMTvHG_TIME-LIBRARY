@@ -101,8 +101,8 @@ Choose5:
 	  add $a3, $sp, $zero # $a3 = Address of DD/MM/YYYY string
 	  jal Date
 	  add $v1, $v0, $zero
-	la $a0, $v0
-	la $a1, $v1
+	add $a0, $v0, $zero
+	add $a1, $v1, $zero
 	jal GetTime
 	#Luu tru $a0, $v0
 	addi $sp,$sp,-8
