@@ -981,6 +981,11 @@ check:
 	slt $t1, $zero, $t0
 	beq $t1, $zero, checkFailure
 	
+	# check YEAR value
+	lw $t0, 0($fp)
+	addi $t0, $t0, -1
+	beq $t0, $zero, checkFailure
+	
 	# check DAY value
 	lw $a0, 4($fp) # load MONTH value to parameter $a0
 	lw $a1, 0($fp) # load YEAR value to parameter $a1
