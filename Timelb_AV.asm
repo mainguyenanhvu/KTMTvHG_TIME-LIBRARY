@@ -530,33 +530,58 @@ sw $t2,0($sp)
 addi $sp,$sp,-4 
 sw $t3,0($sp)
 
+#Luu $t4
+addi $sp,$sp,-4 
+sw $t4,0($sp)
+
 	jal Day
 	add $t0,$v0,$0 
 
 	jal Month
 	add $t1,$v0,$0
-	
+
 	jal Year
 	add $t2,$v0,$0
 
-	add $v0,$t0,$t1
+BeginIfWeekDay:
+	addi $t3,$0,3
+	slt $t4,$t1,$t3
+	beq $t4,$0,ElseIfWeekDay
+	add $t0,$t0,$t2
+	addi $t2,$t2,-1
+	j EndIfWD
+ElseIfWeekDay:
+	add $t0,$t0,$t2
+	addi $t0,$t0,-2
+EndIfWD:
+	addi $v0,$t0,4
+
+	addi $t3,$0,4
+	div $t2,$t3
+	mflo $t3
+	add $v0,$v0,$t3
+
 	addi $t3,$0,100
 	div $t2,$t3
-	mfhi $t3 #Year div 100 + 1= The ki
-	addi $t3,$t3,1
+	mflo $t3
+	sub $v0,$v0,$t3
+
+	addi $t3,$0,400
+	div $t2,$t3
+	mflo $t3
+	add $v0,$v0,$t3
+
+	addi $t3,$0,23
+	mult $t1,$t3 
+	mflo $t1
+	addi $t3,$0,9
+	div $t1,$t3
+	mflo $t3
 	add $v0,$v0,$t3
 	
-	mflo $t3 #Year mod 100
-	add $v0,$v0,$t3
-
-	addi $t2,$0,4
-	div $t3,$t2
-	mflo $t2  #Year div 4
-	add $v0,$v0,$t2
-	addi $t2,$0,7
-	div $v0,$t2 
-	mfhi $v0 #mod 7
-
+	addi $t3,$0,7
+	div $v0,$t3
+	mfhi $v0
 SwitchCaseOfWeekday:	
 	bne $v0,$0,Mon
 	la $v0,Sunday
@@ -589,7 +614,10 @@ Fri:
 Sat:
 	la $v0,Saturday
 EndSwitchCaseOfWeekday:
-	
+
+#Tra lai giá tri cho $t4
+lw $t4,0($sp)
+addi $sp,$sp,4	
 #Tra lai giá tri cho $t3
 lw $t3,0($sp)
 addi $sp,$sp,4
