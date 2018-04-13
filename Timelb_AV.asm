@@ -1,4 +1,4 @@
-.data 
+.data #,a
 	time: .asciiz"04/04/2018"
 	time1: .asciiz"28/02/2018"
 	time2: .asciiz"29/02/2016"
