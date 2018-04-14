@@ -41,10 +41,21 @@
 #-----------------------------------------------------------
 
 main: 
+	addi $sp, $sp, -4
+	sw $ra, 0($sp) # push in $ra
+	addi $sp, $sp, -4
+	sw $fp, 0($sp) # push in $fp
+	addi $sp, $sp, -12 # reserved for TIME as STRING
+	addi $sp, $sp, -4 # reserved for DAY as INT
+	addi $sp, $sp, -4 # reserved for MONTH as INT
+	addi $sp, $sp, -4 # reserved for YEAR as INT
+	add $fp, $sp, $zero # $fp = $sp
 	
-	#jal GetTime
-	#add $a0,$v0,$0
-	#li $v0,1 #In kieu int
+	# main body
+	add $a0, $zero, $fp # $a0 points to [YEAR, MONTH, DAY]
+	addi $a1, $fp, 12 # $a1 stores address of TIME STRING
+	jal nhap
+	addi $a0, $fp, 12 # $a1 stores address of TIME STRING
 ChooseRequestNumber:
 	#In thong bao va doc ki tu
 	la $a0,startAnnounce
