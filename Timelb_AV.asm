@@ -268,6 +268,7 @@ Choose2: # Chuyen doi time thanh mot dinh dang khac. Ket qua tra ve: $v0: string
 	addi $sp,$sp,8
 	j EndChooseRequestNumber
 Choose1: #Xuat time ra man hinh
+	addi $t1,$t1,-1
 	bne $t1,$t0,ChooseRequestNumber
 	addi $sp,$sp,-8
 	sw $a0,0($sp)
