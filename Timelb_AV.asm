@@ -63,7 +63,7 @@ ChooseRequestNumber:
 	addi $t1,$t1,5 #$t1 la ki tu 54 (so 6)
 	slt $t2,$t1,$t0
 	bne $t2,$0,ChooseRequestNumber #Ki tu doc vao >54 (lon hon 6)
-Choose6:
+Choose6: #Cho biet 2 nam nhuan tiep sau nam o time. Ket qua tra ve:
 	bne $t1,$t0,Choose5
 	#jal NextLeapYear
 	#Luu tru $a0, $v0
@@ -90,7 +90,7 @@ Choose6:
 	lw $a0,0($sp)
 	addi $sp,$sp,8
 	j EndChooseRequestNumber
-Choose5:
+Choose5: #Cho biet khoang thoi gian (nam) giua time1 va time2. Ket qua tra ve: $v0: int
 	addi $t1,$t1,-1
 	bne $t1,$t0,Choose4
 	#jal Nhap time1
@@ -147,7 +147,7 @@ Choose5:
 	li $v0,1 #In kieu int
 	syscall
 	j EndChooseRequestNumber
-Choose4:
+Choose4: #Kiem tra nam o time co phai la NAM NHUAN khong? Ket qua tra ve: $v0: int; 0 - false; 1 - true
 	addi $t1,$t1,-1
 	bne $t1,$t0,Choose3
 	#jal LeapYear
@@ -175,7 +175,7 @@ Choose4:
 	lw $a0,0($sp)
 	addi $sp,$sp,8
 	j EndChooseRequestNumber
-Choose3:
+Choose3: #Cho biet ngay vua nhap la ngay thu may trong tuan. Ket qua tra ve la string: $v0
 	addi $t1,$t1,-1
 	bne $t1,$t0,Choose2
 	la $a0,time
@@ -208,7 +208,7 @@ Choose3:
 	li $v0,4 #In xau ra man hinh
 	syscall
 	j EndChooseRequestNumber
-Choose2:
+Choose2: # Chuyen doi time thanh mot dinh dang khac. Ket qua tra ve: $v0: string
 	addi $t1,$t1,-1
 	bne $t1,$t0,Choose1
 	ChooseRequestAlphabet:
@@ -256,8 +256,7 @@ Choose2:
 	lw $a0,0($sp)
 	addi $sp,$sp,8
 	j EndChooseRequestNumber
-Choose1:
-	#jal 
+Choose1: #Xuat time ra man hinh
 	bne $t1,$t0,ChooseRequestNumber
 	addi $sp,$sp,-8
 	sw $a0,0($sp)
