@@ -123,6 +123,10 @@ Choose6: #Cho biet 2 nam nhuan tiep sau nam o time. Ket qua tra ve:
 Choose5: #Cho biet khoang thoi gian (nam) giua time1 va time2. Ket qua tra ve: $v0: int
 	addi $t1,$t1,-1
 	bne $t1,$t0,Choose4
+	# Print newline
+	la $a0, newline
+	li $v0, 4
+	syscall
 	#jal Nhap time1
 	  addi $sp, $sp, -12 # Allocate space for [Y, M, D] array on stack
 	  add $a0, $zero, $sp
