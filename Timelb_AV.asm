@@ -114,11 +114,11 @@ Choose5:
 	  addi $sp, $sp, 12 # Deallocate space for [Y, M, D] array
 	  addi $sp, $sp, -12 # Allocate space for DD/MM/YYYY string
 	  add $a3, $sp, $zero # $a3 = Address of DD/MM/YYYY string
-	  jal Date
-	  add $v1, $v0, $zero
-	add $a0, $v0, $zero
-	add $a1, $v1, $zero
+	add $a1, $sp, $zero # &time2[0] = $sp
+	addi $a0, $sp, 12 # &time1[0] = $sp + 12
 	jal GetTime
+	# Deallocate stack for time1 and time2
+	addi $sp, $sp, 24
 	#Luu tru $a0, $v0
 	addi $sp,$sp,-8
 	sw $a0,0($sp)
