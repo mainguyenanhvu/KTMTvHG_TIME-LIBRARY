@@ -55,7 +55,26 @@ main:
 	add $a0, $zero, $fp # $a0 points to [YEAR, MONTH, DAY]
 	addi $a1, $fp, 12 # $a1 stores address of TIME STRING
 	jal nhap
-	addi $a0, $fp, 12 # $a1 stores address of TIME STRING
+	lw $a2, 0($sp) # Save YEAR to $a2
+  	lw $a1, 4($sp) # Save MONTH to $a1
+	lw $a0, 8($sp) # Save DAY to $a0
+	addi $sp, $sp, 12 # Deallocate space for [Y, M, D] array 
+	addi $sp, $sp, -12 # Allocate space for DD/MM/YYYY string
+	add $a3, $sp, $zero # $a3 = Address of DD/MM/YYYY string
+	jal Date
+	
+	add $t0,$0,$0
+	addi $t1,$0,12
+ChuyenGiaTriVaoTime:
+	add $t2,$sp,$t0
+	lb $t3,0($t2)
+	la $t2,time
+	add $t2,$t2,$t0
+	sb $t3,0($t2)
+	addi $t1,$t1,-1
+	addi $t0,$t0,1
+	bne $t1,$0,ChuyenGiaTriVaoTime
+
 ChooseRequestNumber:
 	#In thong bao va doc ki tu
 	la $a0,startAnnounce
@@ -108,25 +127,52 @@ Choose5: #Cho biet khoang thoi gian (nam) giua time1 va time2. Ket qua tra ve: $
 	  addi $sp, $sp, -12 # Allocate space for [Y, M, D] array on stack
 	  add $a0, $zero, $sp
 	  jal nhap
-	  lw $a2, 0($a0) # Save YEAR to $a2
-	  lw $a1, 4($a0) # Save MONTH to $a1
-	  lw $a0, 8($a0) # Save DAY to $a0
+	  lw $a2, 0($sp) # Save YEAR to $a2
+	  lw $a1, 4($sp) # Save MONTH to $a1
+	  lw $a0, 8($sp) # Save DAY to $a0
 	  addi $sp, $sp, 12 # Deallocate space for [Y, M, D] array
 	  addi $sp, $sp, -12 # Allocate space for DD/MM/YYYY string
 	  add $a3, $sp, $zero # $a3 = Address of DD/MM/YYYY string
 	  jal Date
+	  #sw $v0,0($sp)
+	add $t0,$0,$0
+	addi $t1,$0,12
+ChuyenGiaTriVaoTime1:
+	add $t2,$sp,$t0
+	lb $t3,0($t2)
+	la $t2,time1
+	add $t2,$t2,$t0
+	sb $t3,0($t2)
+	addi $t1,$t1,-1
+	addi $t0,$t0,1
+	bne $t1,$0,ChuyenGiaTriVaoTime1
+
 	#jal Nhap time2
 	  addi $sp, $sp, -12 # Allocate space for [Y, M, D] array on stack
 	  add $a0, $zero, $sp
 	  jal nhap
-	  lw $a2, 0($a0) # Save YEAR to $a2
-	  lw $a1, 4($a0) # Save MONTH to $a1
-	  lw $a0, 8($a0) # Save DAY to $a0
+	  lw $a2, 0($sp) # Save YEAR to $a2
+	  lw $a1, 4($sp) # Save MONTH to $a1
+	  lw $a0, 8($sp) # Save DAY to $a0
 	  addi $sp, $sp, 12 # Deallocate space for [Y, M, D] array
 	  addi $sp, $sp, -12 # Allocate space for DD/MM/YYYY string
 	  add $a3, $sp, $zero # $a3 = Address of DD/MM/YYYY string
-	add $a1, $sp, $zero # &time2[0] = $sp
-	addi $a0, $sp, 12 # &time1[0] = $sp + 12
+	  jal Date
+	add $t0,$0,$0
+	addi $t1,$0,12
+ChuyenGiaTriVaoTime2:
+	add $t2,$sp,$t0
+	lb $t3,0($t2)
+	la $t2,time2
+	add $t2,$t2,$t0
+	sb $t3,0($t2)
+	addi $t1,$t1,-1
+	addi $t0,$t0,1
+	bne $t1,$0,ChuyenGiaTriVaoTime2
+	#add $a1, $v0, $0 # &time2[0] = $sp
+	#addi $a0, $sp, 12 # &time1[0] = $sp + 12
+	la $a0,time1 #($v0)
+	la $a1,time2 #($v1)
 	jal GetTime
 	# Deallocate stack for time1 and time2
 	addi $sp, $sp, 24
