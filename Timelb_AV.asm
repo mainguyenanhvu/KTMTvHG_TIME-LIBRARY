@@ -2,26 +2,25 @@
 	time: .asciiz"04/04/2018"
 	time1: .asciiz"28/02/2018"
 	time2: .asciiz"29/02/2016"
-	Monday: .asciiz"Mon"
-	Tuesday: .asciiz"Tue"
-	Wednesday: .asciiz"Wed"
-	Thursday: .asciiz"Thurs"
-	Friday: .asciiz"Fri"
-	Saturday: .asciiz"Sat"
-	Sunday: .asciiz"Sun"
+	Monday: .asciiz"Monday"
+	Tuesday: .asciiz"Tuesday"
+	Wednesday: .asciiz"Wendesday"
+	Thursday: .asciiz"Thursday"
+	Friday: .asciiz"Friday"
+	Saturday: .asciiz"Saturday"
+	Sunday: .asciiz"Sunday"
 	newline: .asciiz"\n"
 	startAnnounce: .asciiz" ------------Ban hay chon 1 trong cac thao tac duoi day------------ \n 1. Xuat chuoi TIME theo dinh dang DD/MM/YYYY \n 2. Chuyen doi chuoi TIME thanh mot trong cac dinh dang sau: \n     A. MM/DD/YYYY \n     B. Month DD, YYYY \n     C. DD Month, YYYY \n 3. Cho biet ngay vua nhap la ngay thu may trong tuan: \n 4. Kiem tra nam trong chuoi TIME co phai la nam nhuan khong \n 5. Cho biet khoang thoi gian giua chuoi TIME_1 va TIME_2 \n 6. Cho biet 2 nam nhuan gan nhat voi nam trong chuoi time \n"
 	charRequestNumber: .space 2
 	charRequestAlphabet: .space 2
 	stringLuaChon: .asciiz"Lua chon: "
 	stringKetQua: .asciiz"Ket qua: "
-	
+	RequestNumber: .word
 	# Huan's data section . [newline] duplicated
 	promptDay: .asciiz "Nhap ngay DAY: "
 	promptMonth: .asciiz "Nhap thang MONTH: "
 	promptYear: .asciiz "Nhap nam YEAR: "
 	slash: .asciiz "/"
-	space: .asciiz " "
 	
 	#Dat's data
 	error: .asciiz"Error!"
@@ -37,67 +36,58 @@
 	october: .asciiz"October"
 	november: .asciiz"November"
 	december: .asciiz"December"
-
-	typeConversion: .space 20
+	laNamNhuan: .asciiz"La nam nhuan"
+	khongLaNamNhuan: .asciiz"KHONG La nam nhuan"
+	commaSpace: .asciiz", "
 .text
 .globl main
 #-----------------------------------------------------------
 
 main: 
-	addi $sp, $sp, -4
-	sw $ra, 0($sp) # push in $ra
-	addi $sp, $sp, -4
-	sw $fp, 0($sp) # push in $fp
-	addi $sp, $sp, -12 # reserved for TIME as STRING
-	addi $sp, $sp, -4 # reserved for DAY as INT
-	addi $sp, $sp, -4 # reserved for MONTH as INT
-	addi $sp, $sp, -4 # reserved for YEAR as INT
-	add $fp, $sp, $zero # $fp = $sp
-	
-	# main body
-	add $a0, $zero, $fp # $a0 points to [YEAR, MONTH, DAY]
+	addi $sp, $sp, -12
+	add $a0, $sp,$0
 	jal nhap
-	lw $a2, 0($sp) # Save YEAR to $a2
-  	lw $a1, 4($sp) # Save MONTH to $a1
-	lw $a0, 8($sp) # Save DAY to $a0
-	addi $sp, $sp, 12 # Deallocate space for [Y, M, D] array 
-	addi $sp, $sp, -12 # Allocate space for DD/MM/YYYY string
-	add $a3, $sp, $zero # $a3 = Address of DD/MM/YYYY string
+	lw $a0, 8($sp)
+	lw $a1, 4($sp)
+	lw $a2, 0($sp)
+	addi $sp, $sp, 12
+	la $a3, time1
 	jal Date
-	
-	add $t0,$0,$0
-	addi $t1,$0,12
-ChuyenGiaTriVaoTime:
-	add $t2,$sp,$t0
-	lb $t3,0($t2)
-	la $t2,time
-	add $t2,$t2,$t0
-	sb $t3,0($t2)
-	addi $t1,$t1,-1
-	addi $t0,$t0,1
-	bne $t1,$0,ChuyenGiaTriVaoTime
-	addi $sp, $sp, 12 # Deallocate space for TIME string
-
 ChooseRequestNumber:
-	#In thong bao va doc ki tu
-	la $a0,startAnnounce
-	li $v0,4 #In xau ra man hinh
-	syscall
-	li $v0, 8       #Goi ham nhap 1 ki tu
-	la $a0, charRequestNumber        #Tai dia chi de doc
-	li $a1, 2       #Chieu dai cua chuoi la 1 byte va 1 null
-	syscall         #Luu char tu buffer vao charRequest
-	lb $t0,charRequestNumber
 
-	#Kiem tra ki tu nhap vao
-	addi $t1,$0,49
-	slt $t2,$t0,$t1
-	bne $t2,$0,ChooseRequestNumber #Ki tu doc vao <49 (nho hon 1)
-	addi $t1,$t1,5 #$t1 la ki tu 54 (so 6)
-	slt $t2,$t1,$t0
-	bne $t2,$0,ChooseRequestNumber #Ki tu doc vao >54 (lon hon 6)
-Choose6: #Cho biet 2 nam nhuan tiep sau nam o time. Ket qua tra ve:
-	bne $t1,$t0,Choose5
+	la $a0,startAnnounce
+	addi $v0,$0,4 #In xau ra man hinh
+	syscall
+	la $a0, RequestNumber        #Tai dia chi de doc
+	addi $v0, $0, 5
+	syscall
+	add $t1, $v0, $0
+	slti $t0, $t1, 1
+	bne $t0,$0, ChooseRequestNumber
+	slti $t0, $t1, 7
+	beq $t0,$0, ChooseRequestNumber
+	
+	addi $t0, $v0, 48
+	la $t7, charRequestNumber
+	sb $t0, ($t7)
+	addi $t0, $0, 0
+	sb $t0, 1($t7)
+
+	addi $t0, $0, 1
+	beq $t1,$t0, Choose1
+	addi $t0, $0, 2
+	beq $t1,$t0, Choose2
+	addi $t0, $0, 3
+	beq $t1,$t0, Choose3
+	addi $t0, $0, 4
+	beq $t1,$t0, Choose4
+	addi $t0, $0, 5
+	beq $t1,$t0, Choose5
+	addi $t0, $0, 6
+	beq $t1,$t0, Choose6
+	j EndOfFile
+	
+Choose6:
 	#Luu tru $a0, $v0
 	addi $sp,$sp,-8
 	sw $a0,0($sp)
@@ -116,95 +106,37 @@ Choose6: #Cho biet 2 nam nhuan tiep sau nam o time. Ket qua tra ve:
 	syscall
 	la $a0,stringKetQua
 	li $v0,4 #In xau ra man hinh
+	syscall
+	la $a0, time1
+	jal LeapYearNext
+	add $a0, $v0, $0
+	addi $v0, $0, 1
+	syscall
+	la $a0, commaSpace
+	addi $v0, $0, 4
+	syscall
+	add $a0, $v1, $0
+	addi $v0, $0, 1
 	syscall
 	#Tra lai $v0, $a0
 	lw $v0,4($sp)
 	lw $a0,0($sp)
 	addi $sp,$sp,8
-	# Print result
-	la $a0, time
-	jal Year
-	add $a0, $v0, $zero # Print first next leap year
-	jal LeapYearNext
-	add $a0, $v0, $zero 
-	addi $v0, $zero, 1
-	syscall
-		
-	add $t0, $a0, $zero # Save current result
-	
-	la $a0, space # Print space
-	addi $v0, $zero, 4
-	syscall
-
-	add $a0, $t0, $zero # Print second next leap year
-	jal LeapYearNext
-	add $a0, $v0, $zero
-	addi $v0, $zero, 1
-	syscall
 	j EndChooseRequestNumber
-Choose5: #Cho biet khoang thoi gian (nam) giua time1 va time2. Ket qua tra ve: $v0: int
-	addi $t1,$t1,-1
-	bne $t1,$t0,Choose4
-	# Print newline
-	la $a0, newline
-	li $v0, 4
-	syscall
-	#jal Nhap time1
-	  addi $sp, $sp, -12 # Allocate space for [Y, M, D] array on stack
-	  add $a0, $zero, $sp
-	  jal nhap
-	  lw $a2, 0($sp) # Save YEAR to $a2
-	  lw $a1, 4($sp) # Save MONTH to $a1
-	  lw $a0, 8($sp) # Save DAY to $a0
-	  addi $sp, $sp, 12 # Deallocate space for [Y, M, D] array
-	  addi $sp, $sp, -12 # Allocate space for DD/MM/YYYY string
-	  add $a3, $sp, $zero # $a3 = Address of DD/MM/YYYY string
-	  jal Date
-	  #sw $v0,0($sp)
-	add $t0,$0,$0
-	addi $t1,$0,12
-ChuyenGiaTriVaoTime1:
-	add $t2,$sp,$t0
-	lb $t3,0($t2)
-	la $t2,time1
-	add $t2,$t2,$t0
-	sb $t3,0($t2)
-	addi $t1,$t1,-1
-	addi $t0,$t0,1
-	bne $t1,$0,ChuyenGiaTriVaoTime1
-	addi $sp, $sp, 12 # Deallocate space for TIME string
+Choose5:
 
-	#jal Nhap time2
-	  addi $sp, $sp, -12 # Allocate space for [Y, M, D] array on stack
-	  add $a0, $zero, $sp
-	  jal nhap
-	  lw $a2, 0($sp) # Save YEAR to $a2
-	  lw $a1, 4($sp) # Save MONTH to $a1
-	  lw $a0, 8($sp) # Save DAY to $a0
-	  addi $sp, $sp, 12 # Deallocate space for [Y, M, D] array
-	  addi $sp, $sp, -12 # Allocate space for DD/MM/YYYY string
-	  add $a3, $sp, $zero # $a3 = Address of DD/MM/YYYY string
-	  jal Date
-	add $t0,$0,$0
-	addi $t1,$0,12
-
-ChuyenGiaTriVaoTime2:
-	add $t2,$sp,$t0
-	lb $t3,0($t2)
-	la $t2,time2
-	add $t2,$t2,$t0
-	sb $t3,0($t2)
-	addi $t1,$t1,-1
-	addi $t0,$t0,1
-	bne $t1,$0,ChuyenGiaTriVaoTime2
-	addi $sp, $sp, 12 # Deallocate space for TIME string
-	#add $a1, $v0, $0 # &time2[0] = $sp
-	#addi $a0, $sp, 12 # &time1[0] = $sp + 12
-	la $a0,time1 #($v0)
-	la $a1,time2 #($v1)
+	addi $sp, $sp, -12
+	add $a0, $sp,$0
+	jal nhap
+	lw $a0, 8($sp)
+	lw $a1, 4($sp)
+	lw $a2, 0($sp)
+	addi $sp, $sp, 12
+	la $a3, time2
+	jal Date
+	la $a0, time1
+	la $a1, time2
 	jal GetTime
-	# Deallocate stack for time1 and time2
-	addi $sp, $sp, 24
 	#Luu tru $a0, $v0
 	addi $sp,$sp,-8
 	sw $a0,0($sp)
@@ -221,7 +153,7 @@ ChuyenGiaTriVaoTime2:
 	la $a0,newline
 	li $v0,4 #In xau ra man hinh
 	syscall
-	la $a0,stringKetQua
+	la $a0, stringKetQua
 	li $v0,4 #In xau ra man hinh
 	syscall
 	#Tra lai $v0, $a0
@@ -233,10 +165,8 @@ ChuyenGiaTriVaoTime2:
 	li $v0,1 #In kieu int
 	syscall
 	j EndChooseRequestNumber
-Choose4: #Kiem tra nam o time co phai la NAM NHUAN khong? Ket qua tra ve: $v0: int; 0 - false; 1 - true
-	addi $t1,$t1,-1
-	bne $t1,$t0,Choose3
-	la $a0, time
+Choose4:
+	la $a0, time1
 	jal LeapYear
 	#Luu tru $a0, $v0
 	addi $sp,$sp,-8
@@ -254,22 +184,22 @@ Choose4: #Kiem tra nam o time co phai la NAM NHUAN khong? Ket qua tra ve: $v0: i
 	la $a0,newline
 	li $v0,4 #In xau ra man hinh
 	syscall
-	la $a0,stringKetQua
+	lw $v0, 4($sp)
+	beq $v0, $0, KhongLaNamNhuan
+	la $a0, laNamNhuan
+	j PrintLeapYearResult
+KhongLaNamNhuan:
+	la $a0, khongLaNamNhuan
+PrintLeapYearResult:
 	li $v0,4 #In xau ra man hinh
 	syscall
 	#Tra lai $v0, $a0
 	lw $v0,4($sp)
 	lw $a0,0($sp)
 	addi $sp,$sp,8
-	# Print result
-	add $a0, $v0, $zero
-	addi $v0, $zero, 1
-	syscall
 	j EndChooseRequestNumber
-Choose3: #Cho biet ngay vua nhap la ngay thu may trong tuan. Ket qua tra ve la string: $v0
-	addi $t1,$t1,-1
-	bne $t1,$t0,Choose2
-	la $a0,time
+Choose3:
+	la $a0,time1
 	jal Weekday
 	#Luu tru $a0, $v0
 	addi $sp,$sp,-8
@@ -299,9 +229,7 @@ Choose3: #Cho biet ngay vua nhap la ngay thu may trong tuan. Ket qua tra ve la s
 	li $v0,4 #In xau ra man hinh
 	syscall
 	j EndChooseRequestNumber
-Choose2: # Chuyen doi time thanh mot dinh dang khac. Ket qua tra ve: $v0: string
-	addi $t1,$t1,-1
-	bne $t1,$t0,Choose1
+Choose2:
 	ChooseRequestAlphabet:
 		li $v0, 8       #Goi ham nhap 1 ki tu
 		la $a0, charRequestAlphabet        #Tai dia chi de doc
@@ -318,8 +246,8 @@ Choose2: # Chuyen doi time thanh mot dinh dang khac. Ket qua tra ve: $v0: string
 		bne $t2,$0,ChooseRequestAlphabet #Ki tu doc vao >67 (lon hon "C")
 	EndChooseRequestAlphabet:
 	add $a1,$0,$t0
-	la $a0,time
-	la $a2, typeConversion
+	la $a0,time1
+	la $a2, stringKetQua
 	jal Convert
 	#Luu tru $a0, $v0
 	addi $sp,$sp,-8
@@ -347,50 +275,39 @@ Choose2: # Chuyen doi time thanh mot dinh dang khac. Ket qua tra ve: $v0: string
 	lw $v0,4($sp)
 	lw $a0,0($sp)
 	addi $sp,$sp,8
-	# Print result
-	la $a0, typeConversion
-	addi $v0, $zero, 4
-	syscall
+	addi $sp, $sp, 4
 	j EndChooseRequestNumber
-Choose1: #Xuat time ra man hinh
-	addi $t1,$t1,-1
-	bne $t1,$t0,ChooseRequestNumber
-	addi $sp,$sp,-8
-	sw $a0,0($sp)
-	sw $v0,4($sp)
+Choose1:
+	sw $a0, ($sp)
 	la $a0,newline
-	li $v0,4 #In xau ra man hinh
+	addi $v0,$0,4 #In xau ra man hinh
 	syscall
 	la $a0,stringLuaChon
-	li $v0,4 #In xau ra man hinh
+	addi $v0,$0,4 #In xau ra man hinh
 	syscall
 	la $a0, charRequestNumber
-	li $v0,4    # in ki tu ra nam hinh
+	addi $v0,$0,4    # in ki tu ra nam hinh
 	syscall
 	la $a0,newline
-	li $v0,4 #In xau ra man hinh
+	addi $v0,$0,4 #In xau ra man hinh
 	syscall
 	la $a0,stringKetQua
-	li $v0,4 #In xau ra man hinh
+	addi $v0,$0,4 #In xau ra man hinh
 	syscall
-	#Tra lai $v0, $a0
-	lw $v0,4($sp)
-	lw $a0,0($sp)
-	addi $sp,$sp,8
-	# Print result
-	la $a0, time
-	addi $v0, $zero, 4
+	
+	la $a0, time1
+	addi $v0,$0,4 #In xau ra man hinh
 	syscall
 EndChooseRequestNumber:
 	j EndOfFile
 #-----------------------------------------------------------
 
 #-----------------------------------------------------------
-#Gia su l‡ biÈn time da duoc truyen v‡o thanh ghi $a0
-#$a0: Luu tham so truyen v‡o tu bien time
+#Gia su l√† bi√©n time da duoc truyen v√†o thanh ghi $a0
+#$a0: Luu tham so truyen v√†o tu bien time
 #$v0: Luu ket qua tra ve 
 #$t0: Luu so 10
-#$t1: Luu kÌ tu duoc trÌch ra tu $a0
+#$t1: Luu k√≠ tu duoc tr√≠ch ra tu $a0
 #$t2: Dem vong lap
 #$t3: Luu ket qua tra ve($t3=$t3$t0 + $t1)
 Day:
@@ -419,54 +336,54 @@ sw $t2,0($sp)
 addi $sp,$sp,-4 
 sw $t3,0($sp)
 
-add $t3,$0,$0 #G·n $t3 = 0
-addi $t0,$0,10 #G·n $t0=10
-addi $t2,$0,2 #So kÌ tu trÌch ra 
+add $t3,$0,$0 #G√°n $t3 = 0
+addi $t0,$0,10 #G√°n $t0=10
+addi $t2,$0,2 #So k√≠ tu tr√≠ch ra 
 
 LoopExtractDay:
 	addi $t2,$t2,-1 #Giam buoc lap
-	lb $t1,($a0) #Lay ki tu trong x‚u
-	addi $t1,$t1,-48 # kÌ tu -'0' ra int
-	addi $a0,$a0,1 #Doi vi trÌ tro v‡o kÌ tu
+	lb $t1,($a0) #Lay ki tu trong x√¢u
+	addi $t1,$t1,-48 # k√≠ tu -'0' ra int
+	addi $a0,$a0,1 #Doi vi tr√≠ tro v√†o k√≠ tu
 	mult $t3,$t0 #Nhan $t3 va $t0
 	mflo $t3 #Chuyen $LO vao $t3
 	add $t3,$t3,$t1 ##$t3= $t3 + $t1
-	#Kiem tra dieu kien tho·t: $t2=0
+	#Kiem tra dieu kien tho√°t: $t2=0
 	beq $t2,$0,EndLoopED
 	j LoopExtractDay
 EndLoopED:
 
-#G·n gi· tri cho $v0
+#G√°n gi√° tri cho $v0
 add $v0,$t3,$0
-#Tra lai gi· tri cho $t3
+#Tra lai gi√° tri cho $t3
 lw $t3,0($sp)
 addi $sp,$sp,4
-#Tra lai gi· tri cho $t2
+#Tra lai gi√° tri cho $t2
 lw $t2,0($sp)
 addi $sp,$sp,4 
-#Tra lai gi· tri cho $a0
+#Tra lai gi√° tri cho $a0
 lw $a0,0($sp)
 addi $sp,$sp,4 
-#Tra lai gi· tri cho $t1
+#Tra lai gi√° tri cho $t1
 lw $t1,0($sp)
 addi $sp,$sp,4 
-#Tra lai gi· tri cho $t0
+#Tra lai gi√° tri cho $t0
 lw $t0,0($sp)
 addi $sp,$sp,4 
-#Tra lai gi· tri cho $ra
+#Tra lai gi√° tri cho $ra
 lw $ra,0($sp) 
 addi $sp,$sp,4 
 
-jr $ra #Tro lai h‡m truoc dÛ
+jr $ra #Tro lai h√†m truoc d√≥
 EndDay:
 #-----------------------------------------------------------
 
 #-----------------------------------------------------------
-#Gia su l‡ biÈn time da duoc truyen v‡o thanh ghi $a0
-#$a0: Luu tham so truyen v‡o tu bien time
+#Gia su l√† bi√©n time da duoc truyen v√†o thanh ghi $a0
+#$a0: Luu tham so truyen v√†o tu bien time
 #$v0: Luu ket qua tra ve 
 #$t0: Luu so 10
-#$t1: Luu kÌ tu duoc trÌch ra tu $a0
+#$t1: Luu k√≠ tu duoc tr√≠ch ra tu $a0
 #$t2: Dem vong lap
 #$t3: Luu ket qua tra ve($t3=$t3$t0 + $t1)
 Month:
@@ -495,55 +412,55 @@ sw $t2,0($sp)
 addi $sp,$sp,-4 
 sw $t3,0($sp)
 
-add $t3,$0,$0 #G·n $t3 = 0
-addi $t0,$0,10 #G·n $t0=10
-addi $t2,$0,2 #So kÌ tu trÌch ra 
+add $t3,$0,$0 #G√°n $t3 = 0
+addi $t0,$0,10 #G√°n $t0=10
+addi $t2,$0,2 #So k√≠ tu tr√≠ch ra 
 addi $a0,$a0,3 #Bo qua ngay va dau '/'
 
 LoopExtractMonth:
 	addi $t2,$t2,-1 #Giam buoc lap
-	lb $t1,($a0) #Lay ki tu trong x‚u
-	addi $t1,$t1,-48 # kÌ tu -'0' ra int
-	addi $a0,$a0,1 #Doi vi trÌ tro v‡o kÌ tu
+	lb $t1,($a0) #Lay ki tu trong x√¢u
+	addi $t1,$t1,-48 # k√≠ tu -'0' ra int
+	addi $a0,$a0,1 #Doi vi tr√≠ tro v√†o k√≠ tu
 	mult $t3,$t0 #Nhan $t3 va $t0
 	mflo $t3 #Chuyen $LO vao $t3
 	add $t3,$t3,$t1 ##$t3= $t3 + $t1
-	#Kiem tra dieu kien tho·t: $t2=0
+	#Kiem tra dieu kien tho√°t: $t2=0
 	beq $t2,$0,EndLoopEMonth
 	j LoopExtractMonth
 EndLoopEMonth:
 
-#G·n gi· tri cho $v0
+#G√°n gi√° tri cho $v0
 add $v0,$t3,$0
-#Tra lai gi· tri cho $t3
+#Tra lai gi√° tri cho $t3
 lw $t3,0($sp)
 addi $sp,$sp,4
-#Tra lai gi· tri cho $t2
+#Tra lai gi√° tri cho $t2
 lw $t2,0($sp)
 addi $sp,$sp,4 
-#Tra lai gi· tri cho $a0
+#Tra lai gi√° tri cho $a0
 lw $a0,0($sp)
 addi $sp,$sp,4 
-#Tra lai gi· tri cho $t1
+#Tra lai gi√° tri cho $t1
 lw $t1,0($sp)
 addi $sp,$sp,4 
-#Tra lai gi· tri cho $t0
+#Tra lai gi√° tri cho $t0
 lw $t0,0($sp)
 addi $sp,$sp,4 
-#Tra lai gi· tri cho $ra
+#Tra lai gi√° tri cho $ra
 lw $ra,0($sp) 
 addi $sp,$sp,4 
 
-jr $ra #Tro lai h‡m truoc dÛ
+jr $ra #Tro lai h√†m truoc d√≥
 EndMonth:
 #-----------------------------------------------------------
 
 #-----------------------------------------------------------
-#Gia su l‡ biÈn time da duoc truyen v‡o thanh ghi $a0
-#$a0: Luu tham so truyen v‡o tu bien time
+#Gia su l√† bi√©n time da duoc truyen v√†o thanh ghi $a0
+#$a0: Luu tham so truyen v√†o tu bien time
 #$v0: Luu ket qua tra ve 
 #$t0: Luu so 10
-#$t1: Luu kÌ tu duoc trÌch ra tu $a0
+#$t1: Luu k√≠ tu duoc tr√≠ch ra tu $a0
 #$t2: Dem vong lap
 #$t3: Luu ket qua tra ve($t3=$t3$t0 + $t1)
 Year:
@@ -572,46 +489,46 @@ sw $t2,0($sp)
 addi $sp,$sp,-4 
 sw $t3,0($sp)
 
-add $t3,$0,$0 #G·n $t3 = 0
-addi $t0,$0,10 #G·n $t0=10
-addi $t2,$0,4 #So kÌ tu trÌch ra 
+add $t3,$0,$0 #G√°n $t3 = 0
+addi $t0,$0,10 #G√°n $t0=10
+addi $t2,$0,4 #So k√≠ tu tr√≠ch ra 
 addi $a0,$a0,6 #Bo qua ngay va dau '/'
 
 LoopExtractYear:
 	addi $t2,$t2,-1 #Giam buoc lap
-	lb $t1,($a0) #Lay ki tu trong x‚u
-	addi $t1,$t1,-48 # kÌ tu -'0' ra int
-	addi $a0,$a0,1 #Doi vi trÌ tro v‡o kÌ tu
+	lb $t1,($a0) #Lay ki tu trong x√¢u
+	addi $t1,$t1,-48 # k√≠ tu -'0' ra int
+	addi $a0,$a0,1 #Doi vi tr√≠ tro v√†o k√≠ tu
 	mult $t3,$t0 #Nhan $t3 va $t0
 	mflo $t3 #Chuyen $LO vao $t3
 	add $t3,$t3,$t1 ##$t3= $t3 + $t1
-	#Kiem tra dieu kien tho·t: $t2=0
+	#Kiem tra dieu kien tho√°t: $t2=0
 	beq $t2,$0,EndLoopEYear
 	j LoopExtractYear
 EndLoopEYear:
 
-#G·n gi· tri cho $v0
+#G√°n gi√° tri cho $v0
 add $v0,$t3,$0
-#Tra lai gi· tri cho $t3
+#Tra lai gi√° tri cho $t3
 lw $t3,0($sp)
 addi $sp,$sp,4
-#Tra lai gi· tri cho $t2
+#Tra lai gi√° tri cho $t2
 lw $t2,0($sp)
 addi $sp,$sp,4 
-#Tra lai gi· tri cho $a0
+#Tra lai gi√° tri cho $a0
 lw $a0,0($sp)
 addi $sp,$sp,4 
-#Tra lai gi· tri cho $t1
+#Tra lai gi√° tri cho $t1
 lw $t1,0($sp)
 addi $sp,$sp,4 
-#Tra lai gi· tri cho $t0
+#Tra lai gi√° tri cho $t0
 lw $t0,0($sp)
 addi $sp,$sp,4 
-#Tra lai gi· tri cho $ra
+#Tra lai gi√° tri cho $ra
 lw $ra,0($sp) 
 addi $sp,$sp,4 
 
-jr $ra #Tro lai h‡m truoc dÛ
+jr $ra #Tro lai h√†m truoc d√≥
 EndYear:
 #-----------------------------------------------------------
 
@@ -730,29 +647,29 @@ Sat:
 	la $v0,Saturday
 EndSwitchCaseOfWeekday:
 
-#Tra lai gi· tri cho $t4
+#Tra lai gi√° tri cho $t4
 lw $t4,0($sp)
 addi $sp,$sp,4	
-#Tra lai gi· tri cho $t3
+#Tra lai gi√° tri cho $t3
 lw $t3,0($sp)
 addi $sp,$sp,4
-#Tra lai gi· tri cho $t2
+#Tra lai gi√° tri cho $t2
 lw $t2,0($sp)
 addi $sp,$sp,4 
-#Tra lai gi· tri cho $a0
+#Tra lai gi√° tri cho $a0
 lw $a0,0($sp)
 addi $sp,$sp,4 
-#Tra lai gi· tri cho $t1
+#Tra lai gi√° tri cho $t1
 lw $t1,0($sp)
 addi $sp,$sp,4 
-#Tra lai gi· tri cho $t0
+#Tra lai gi√° tri cho $t0
 lw $t0,0($sp)
 addi $sp,$sp,4 
-#Tra lai gi· tri cho $ra
+#Tra lai gi√° tri cho $ra
 lw $ra,0($sp) 
 addi $sp,$sp,4 
 
-jr $ra #Tro lai h‡m truoc dÛ
+jr $ra #Tro lai h√†m truoc d√≥
 EndWeekday:
 #------------------------------------------------------------------
 
@@ -848,29 +765,29 @@ sw $a1,0($sp)
 EndIfGetTime:
 add $v0,$t2,$0
 
-#Tra lai gi· tri cho $a1
+#Tra lai gi√° tri cho $a1
 lw $a1,0($sp)
 addi $sp,$sp,4  
-#Tra lai gi· tri cho $a0
+#Tra lai gi√° tri cho $a0
 lw $a0,0($sp)
 addi $sp,$sp,4
-#Tra lai gi· tri cho $t3
+#Tra lai gi√° tri cho $t3
 lw $t3,0($sp)
 addi $sp,$sp,4
-#Tra lai gi· tri cho $t2
+#Tra lai gi√° tri cho $t2
 lw $t2,0($sp)
 addi $sp,$sp,4 
-#Tra lai gi· tri cho $t1
+#Tra lai gi√° tri cho $t1
 lw $t1,0($sp)
 addi $sp,$sp,4 
-#Tra lai gi· tri cho $t0
+#Tra lai gi√° tri cho $t0
 lw $t0,0($sp)
 addi $sp,$sp,4 
-#Tra lai gi· tri cho $ra
+#Tra lai gi√° tri cho $ra
 lw $ra,0($sp) 
 addi $sp,$sp,4 
 
-jr $ra #Tro lai h‡m truoc dÛ
+jr $ra #Tro lai h√†m truoc d√≥
 EndGetTime:
 #-----------------------------------------------------------
 
@@ -1126,6 +1043,7 @@ check:
 	
 	# check YEAR value
 	lw $t0, 0($fp)
+	addi $t0, $t0, -1
 	beq $t0, $zero, checkFailure
 	
 	# check DAY value
@@ -1302,9 +1220,9 @@ dayInMonth:
 	lw $ra, 0($sp) # pop $ra
 	addi $sp, $sp, 4
 	jr $ra
-#**********************************************************************
-#******************************Dat's Function**************************
-#**********************************************************************
+#******************************************************************************
+#******************************Dat's Function**********************************
+#******************************************************************************
 #_________________Ham IsLeapYear_____________________
 #$a0: nam can kiem tra
 # $v0==1 True, $v0==0 False
@@ -1369,14 +1287,15 @@ jr $ra
 
 
 #_________________Ham LeapYearNext_____________________
-#$a0: nam hien tai
+#$a0: chuoi time
 #v0: nam nhuan ke tiep cua nam hien hanh
 LeapYearNext:
 addi $sp, $sp, -8
 sw $ra, 4($sp)
 sw $t0, ($sp)
 
-add $t0,$a0,$0
+jal Year
+add $t0,$v0,$0
 addi $t0, $t0, 1
 LoopFindNextYear:
 	add $a0,$t0,$0
@@ -1386,6 +1305,7 @@ LoopFindNextYear:
 	j LoopFindNextYear
 EndLoopFindNextYear:
 	add $v0, $a0,$0
+	addi $v1, $v0, 4 
 EndLeapYearNext:
 lw $ra, 4($sp)
 lw $t0, ($sp)
