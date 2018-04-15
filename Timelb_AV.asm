@@ -1043,7 +1043,6 @@ check:
 	
 	# check YEAR value
 	lw $t0, 0($fp)
-	addi $t0, $t0, -1
 	beq $t0, $zero, checkFailure
 	
 	# check DAY value
