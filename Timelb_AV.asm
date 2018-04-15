@@ -93,19 +93,19 @@ Choose6:
 	sw $a0,0($sp)
 	sw $v0,4($sp)
 	la $a0,newline
-	li $v0,4 #In xau ra man hinh
+	addi $v0,$0,4 #In xau ra man hinh
 	syscall
 	la $a0,stringLuaChon
-	li $v0,4 #In xau ra man hinh
+	addi $v0,$0,4 #In xau ra man hinh
 	syscall
 	la $a0, charRequestNumber
-	li $v0,4    # in ki tu ra nam hinh
+	addi $v0,$0,4    # in ki tu ra nam hinh
 	syscall
 	la $a0,newline
-	li $v0,4 #In xau ra man hinh
+	addi $v0,$0,4 #In xau ra man hinh
 	syscall
 	la $a0,stringKetQua
-	li $v0,4 #In xau ra man hinh
+	addi $v0,$0,4 #In xau ra man hinh
 	syscall
 	la $a0, time1
 	jal LeapYearNext
@@ -142,19 +142,19 @@ Choose5:
 	sw $a0,0($sp)
 	sw $v0,4($sp)
 	la $a0,newline
-	li $v0,4 #In xau ra man hinh
+	addi $v0,$0,4 #In xau ra man hinh
 	syscall
 	la $a0,stringLuaChon
-	li $v0,4 #In xau ra man hinh
+	addi $v0,$0,4 #In xau ra man hinh
 	syscall
 	la $a0, charRequestNumber
-	li $v0,4    # in ki tu ra nam hinh
+	addi $v0,$0,4    # in ki tu ra nam hinh
 	syscall
 	la $a0,newline
-	li $v0,4 #In xau ra man hinh
+	addi $v0,$0,4 #In xau ra man hinh
 	syscall
 	la $a0, stringKetQua
-	li $v0,4 #In xau ra man hinh
+	addi $v0,$0,4 #In xau ra man hinh
 	syscall
 	#Tra lai $v0, $a0
 	lw $v0,4($sp)
@@ -162,7 +162,7 @@ Choose5:
 	addi $sp,$sp,8
 	#In ket qua
 	add $a0,$v0,$0
-	li $v0,1 #In kieu int
+	addi $v0,$0,1 #In kieu int
 	syscall
 	j EndChooseRequestNumber
 Choose4:
@@ -173,16 +173,16 @@ Choose4:
 	sw $a0,0($sp)
 	sw $v0,4($sp)
 	la $a0,newline
-	li $v0,4 #In xau ra man hinh
+	addi $v0,$0,4 #In xau ra man hinh
 	syscall
 	la $a0,stringLuaChon
-	li $v0,4 #In xau ra man hinh
+	addi $v0,$0,4 #In xau ra man hinh
 	syscall
 	la $a0, charRequestNumber
-	li $v0,4    # in ki tu ra nam hinh
+	addi $v0,$0,4    # in ki tu ra nam hinh
 	syscall
 	la $a0,newline
-	li $v0,4 #In xau ra man hinh
+	addi $v0,$0,4 #In xau ra man hinh
 	syscall
 	lw $v0, 4($sp)
 	beq $v0, $0, KhongLaNamNhuan
@@ -191,7 +191,7 @@ Choose4:
 KhongLaNamNhuan:
 	la $a0, khongLaNamNhuan
 PrintLeapYearResult:
-	li $v0,4 #In xau ra man hinh
+	addi $v0,$0,4 #In xau ra man hinh
 	syscall
 	#Tra lai $v0, $a0
 	lw $v0,4($sp)
@@ -206,19 +206,19 @@ Choose3:
 	sw $a0,0($sp)
 	sw $v0,4($sp)
 	la $a0,newline
-	li $v0,4 #In xau ra man hinh
+	addi $v0,$0,4 #In xau ra man hinh
 	syscall
 	la $a0,stringLuaChon
-	li $v0,4 #In xau ra man hinh
+	addi $v0,$0,4 #In xau ra man hinh
 	syscall
 	la $a0, charRequestNumber
-	li $v0,4    # in ki tu ra nam hinh
+	addi $v0,$0,4   # in ki tu ra nam hinh
 	syscall
 	la $a0,newline
-	li $v0,4 #In xau ra man hinh
+	addi $v0,$0,4 #In xau ra man hinh
 	syscall
 	la $a0,stringKetQua
-	li $v0,4 #In xau ra man hinh
+	addi $v0,$0,4 #In xau ra man hinh
 	syscall
 	#Tra lai $v0, $a0
 	lw $v0,4($sp)
@@ -226,14 +226,14 @@ Choose3:
 	addi $sp,$sp,8
 	#In ket qua la xau thu trong tuan
 	add $a0,$v0,$0
-	li $v0,4 #In xau ra man hinh
+	addi $v0,$0,4 #In xau ra man hinh
 	syscall
 	j EndChooseRequestNumber
 Choose2:
 	ChooseRequestAlphabet:
-		li $v0, 8       #Goi ham nhap 1 ki tu
+		addi $v0,$0,8       #Goi ham nhap 1 ki tu
 		la $a0, charRequestAlphabet        #Tai dia chi de doc
-		li $a1, 2       #Chieu dai cua chuoi la 1 byte va 1 null
+		addi $a1,$0,2       #Chieu dai cua chuoi la 1 byte va 1 null
 		syscall         #Luu char tu buffer vao charRequest
 		lb $t0,charRequestAlphabet
 
@@ -254,22 +254,22 @@ Choose2:
 	sw $a0,0($sp)
 	sw $v0,4($sp)
 	la $a0,newline
-	li $v0,4 #In xau ra man hinh
+	addi $v0,$0,4 #In xau ra man hinh
 	syscall
 	la $a0,stringLuaChon
-	li $v0,4 #In xau ra man hinh
+	addi $v0,$0,4 #In xau ra man hinh
 	syscall
 	la $a0, charRequestNumber
-	li $v0,4    # in ki tu ra nam hinh
+	addi $v0,$0,4 #In xau ra man hinh
 	syscall
 	la $a0, charRequestAlphabet
-	li $v0,4    # in ki tu ra nam hinh
+	addi $v0,$0,4 #In xau ra man hinh
 	syscall
 	la $a0,newline
-	li $v0,4 #In xau ra man hinh
+	addi $v0,$0,4 #In xau ra man hinh
 	syscall
 	la $a0,stringKetQua
-	li $v0,4 #In xau ra man hinh
+	addi $v0,$0,4 #In xau ra man hinh
 	syscall
 	#Tra lai $v0, $a0
 	lw $v0,4($sp)
